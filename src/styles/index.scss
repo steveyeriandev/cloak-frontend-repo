@@ -1,0 +1,47 @@
+@import "./theme.scss";
+@import "~bootstrap/scss/bootstrap.scss";
+
+/* Can override global css here, however if possible use the bootstrap variables instead and update
+   in "./theme.scss".
+
+   https://github.com/twbs/bootstrap-sass/blob/master/assets/stylesheets/bootstrap/_variables.scss
+*/
+
+// Allow full screen vertical styling
+html,
+body,
+#root,
+.App,
+.App > div,
+.dashboard-route-inner > div,
+.project-route > div[tabindex] {
+  height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.dropdown-menu {
+  padding: 0px;
+  border: 0px !important;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+#account-navbar-dropdown::after {
+  display: none;
+}
+
+.project-route > div:not(.bg-white) {
+  // There is a div created from reach-router that needs 100% height.
+  height: 100%;
+}
+
+.ql-editor {
+  min-height: 200px;
+}
+
+.react-toast-notifications__container {
+  // Put the notification in front of bootstrap modal overlay.
+  z-index: 1080 !important;
+}

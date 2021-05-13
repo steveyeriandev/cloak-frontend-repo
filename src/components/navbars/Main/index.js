@@ -15,6 +15,7 @@ import {
 
 import ProjectSearchControl from "components/controls/ProjectSearch";
 import AccountDropdown from "components/dropdowns/Account";
+import NotificationDropdown from "components/dropdowns/Notification";
 import MobileBucketNavigation from "components/navbars/MobileBucketNavigation";
 import HomeIcon from "images/icons/home.png";
 
@@ -136,6 +137,13 @@ function MainNavbar({ shadow }) {
                     <FontAwesomeIcon icon={faGraduationCap} /> My classes
                   </Nav.Link>
                 )}
+
+              <NotificationDropdown
+                account={accountState}
+                setExpanded={setExpanded}
+              >
+              </NotificationDropdown>
+
               <Nav.Link as={Link} to="/">
                 <StyledHomeIcon src={HomeIcon} alt="Rad how to school home" />
               </Nav.Link>

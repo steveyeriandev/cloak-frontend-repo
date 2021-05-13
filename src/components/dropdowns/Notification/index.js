@@ -45,7 +45,7 @@ function NotificationDropdown({ account, setExpanded }) {
 
   const dispatch = useDispatch();
   const isAuthenticated = account.token !== "";
-  const notifyList = useSelector((state) => state.notifications.notifications);
+  const notifyList = useSelector((state) => state.notifications.notifications.results);
 
   useEffect(() => {
     dispatch(fetchNotifications());
@@ -86,7 +86,7 @@ function NotificationDropdown({ account, setExpanded }) {
     if (isAuthenticated)
       return (
         <>
-          {notifyList && notifyList.map((item, index) => (
+          {!!notifyList && notifyList.map((item, index) => (
             <NavDropdown.Item
               key={`notification_${index}`}
               onClick={() => {

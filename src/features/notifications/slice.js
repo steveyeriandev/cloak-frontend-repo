@@ -19,7 +19,7 @@ const notificationInitialState = {
   entities: {},
 
   // Used to store a single project detail data.
-  notifications: [],
+  notifications: {},
 
 };
 
@@ -41,13 +41,13 @@ const notificationSlice = createSlice({
     },
 
     [updateNotifications.fulfilled]: (state, action) => {
-      const idx = state.notifications.findIndex((item) => item.id === action.payload.id);
-      state.notifications[idx] = action.payload;
+      const idx = state.notifications.results.findIndex((item) => item.id === action.payload.id);
+      state.notifications.results[idx] = action.payload;
     },
 
     [updatePartialNotifications.fulfilled]: (state, action) => {
-      const idx = state.notifications.findIndex((item) => item.id === action.payload.id);
-      state.notifications[idx] = action.payload;
+      const idx = state.notifications.results.findIndex((item) => item.id === action.payload.id);
+      state.notifications.results[idx] = action.payload;
     },
   }
 });

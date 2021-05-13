@@ -15,8 +15,10 @@ import {
 
 import ProjectSearchControl from "components/controls/ProjectSearch";
 import AccountDropdown from "components/dropdowns/Account";
+import NotificationsDropDown from "components/dropdowns/notifications";
 import MobileBucketNavigation from "components/navbars/MobileBucketNavigation";
 import HomeIcon from "images/icons/home.png";
+
 
 const StyledNavbar = styled(Navbar)`
   box-shadow: 0px 1px 0px ${(props) => props.theme.gray300};
@@ -47,11 +49,11 @@ const StyledHomeIcon = styled.img`
   @media (max-width: ${(props) => props.theme.smBreakpoint}) {
     width: auto;
   }
-
   padding: 10px;
   background-color: ${(props) => props.theme.gray300};
   border-radius: ${(props) => props.theme.borderRadius};
 `;
+
 
 const StyledBrand = styled(Navbar.Brand)`
   &:hover {
@@ -139,6 +141,10 @@ function MainNavbar({ shadow }) {
               <Nav.Link as={Link} to="/">
                 <StyledHomeIcon src={HomeIcon} alt="Rad how to school home" />
               </Nav.Link>
+              <NotificationsDropDown
+                account={accountState}
+                setExpanded={setExpanded}
+              />
               {user.isApproved && (
                 <MainNavLink
                   as={Link}

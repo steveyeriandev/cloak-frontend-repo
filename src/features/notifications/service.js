@@ -5,19 +5,19 @@ import { notificationsUrl } from "./api";
 class NotificationService extends ApiService {
   listUrl = notificationsUrl;
 
-  listNotifications(cursor) {
+  listNotifications() {
     // Connects a user's account to stripe.
-    return axiosInstance.get(`${this.listUrl}?cursor=${cursor}`);
+    return axiosInstance.get(`${this.listUrl}`);
   }
 
   updateNotifications(notificationId, payload) {
     // Connects a user's account to stripe.
-    return axiosInstance.put(`${this.listUrl}/${notificationId}`, payload);
+    return axiosInstance.put(`${this.listUrl}${notificationId}/`, payload);
   }
 
   updatePartialNotifications(notificationId, payload) {
     // Connects a user's account to stripe.
-    return axiosInstance.patch(`${this.listUrl}/${notificationId}`, payload);
+    return axiosInstance.patch(`${this.listUrl}${notificationId}/`, payload);
   }
 }
 

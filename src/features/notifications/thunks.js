@@ -10,14 +10,13 @@ const service = new NotificationService();
 
 export const fetchNotifications = createAsyncThunk(
   FETCH_NOTIFICATIONS,
-  async (cusor, { rejectWithValue }) => {
+  async () => {
     // Need to build the url parameters based on the action payload.
     try {
-      const response = await service.listNotifications(cusor);
+      const response = await service.listNotifications();
       return response.data;
     } catch (err) {
-      const { status, data } = err.response;
-      return rejectWithValue({ status, data });
+      console.error(err);
     }
   }
 );

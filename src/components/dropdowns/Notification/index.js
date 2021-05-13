@@ -1,31 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { navigate } from "@reach/router";
-import { useToasts } from "react-toast-notifications";
-import { useModal } from "react-modal-hook";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faComments,
-} from "@fortawesome/free-solid-svg-icons";
-import Nav from "react-bootstrap/Nav";
-
-import FormModal from "components/modals/Form";
-import ChangePasswordForm from "components/forms/Auth/ChangePassword";
-import { logoutUser } from "features/accounts/slice";
-import { clearProjects } from "features/projects/slice";
-import { clearBuckets } from "features/buckets/slice";
-import { fetchNotifications, updateNotifications, updatePartialNotifications } from "features/notifications/thunks";
+import { faComments, faBell } from "@fortawesome/free-solid-svg-icons";
+import { fetchNotifications } from "features/notifications/thunks";
 import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import {
-  createUploadSession,
-  incrementUploadCount,
-  resetUploadSession,
-} from "features/notifications/slice";
+import { updatePartialNotifications } from "../../../features/notifications/thunks";
 
 const StyledNavDropdown = styled(NavDropdown)`
   margin-left: 10px;
@@ -38,198 +23,123 @@ const StyledNavDropdown = styled(NavDropdown)`
   }
 `;
 const MainNavLink = styled.div`
-  background-color: ${(props) => props.theme.gray300};
+  background-color: ${(props) => props.unreadNotify ? 'red' : props.theme.gray300};
   border-radius: ${(props) => props.theme.borderRadius};
-  color: black;
+  color: ${(props) => props.unreadNotify ? 'white' : 'black'};
   padding: 5px 10px !important;
   font-size: 1.3rem;
+`;
 
-  &:hover {
-    color: black;
-  }
+const UnreadIcon = styled.span`
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: red;
+  border-radius: 100%;
+  border: 4px solid #ebecf0;
+  right: 5px;
+  top: 15px;
 `;
 
 function NotificationDropdown({ account, setExpanded }) {
-  // Provides the account dropdown for the user to select various actions at the acccount level.
 
-  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const isAuthenticated = account.token !== "";
-
-  const cursor = 10;
+  const notifyList = useSelector((state) => state.notifications.notifications);
 
   useEffect(() => {
-    async function listNotifications() {
-      await dispatch(fetchNotifications(cursor));
-    }
-    listNotifications();
+    dispatch(fetchNotifications());
   }, []);
 
+  const [unreadNotify, hasUnreadNotify] = useState(false);
 
-  const [showChangePasswordModal, hideChangePasswordModal] = useModal(() => {
-    return (
-      <FormModal title="Change password" onHide={hideChangePasswordModal}>
-        <ChangePasswordForm closeModal={hideChangePasswordModal} />
-      </FormModal>
-    );
-  });
+  useEffect(() => {
+    if (notifyList) {
+      const unreadItems = notifyList.filter(item => {
+        if (!item.seen) {
+          return item;
+        }
+      });
+      hasUnreadNotify(unreadItems.length > 0);
+    } else {
+      hasUnreadNotify(false);
+    }
+  }, [notifyList]);
 
-  function dispatchUserLogout() {
-    return addToast(
-      "You're now logged out, see you soon!",
-      {
-        appearance: "success",
-        autoDismiss: true,
-      },
-      () => {
-        dispatch(logoutUser());
-        dispatch(clearBuckets());
-        dispatch(clearProjects());
-        navigate("/");
-      }
-    );
-  }
+  const diffTime = (created) => {
+    const createdTime = new Date(created);
+    const now = new Date();
+    let diff = (now.getTime() - createdTime.getTime()) / 1000;
+    if (diff < 60) { // seconds
+      return diff + ' seconds';
+    } else if (diff < 3600) { // minutes
+      return (diff / 60).toFixed(0) + ' minutes';
+    } else if (diff < 86400) {
+      return (diff / 3600).toFixed(0) + ' hours';
+    } else {
+      return (diff / 86400).toFixed(0) + ' days';
+    }
+  };
 
-  function renderAuthenticationAction() {
+  const renderNotifyList = () => {
     // Renders the actions in the account dropdown that are dynamic based on if authenticated.
     if (isAuthenticated)
       return (
         <>
-          <NavDropdown.Item
-            onClick={() => {
-              setExpanded(false);
-              navigate(`/users/${account.user.username}`);
-            }}
-          >
-            <Row>
-            <Col sm={2}>
-              <Image
-                roundedCircle 
-                src={'https://cloak-local.s3.amazonaws.com/uploads/users/2/brians.jpg'}
-                className="d-none d-md-block"
-              />
-            </Col>
-            <Col sm={8}>
-              {'This is a notificaiton'}
-            </Col>
-            </Row>
-          </NavDropdown.Item>
-          <NavDropdown.Item
-            onClick={() => {
-              setExpanded(false);
-              navigate(`/users/${account.user.username}`);
-            }}
-          >
-            <Row>
-            <Col sm={2}>
-              <Image
-                roundedCircle 
-                src={'https://cloak-local.s3.amazonaws.com/uploads/users/2/brians.jpg'}
-                className="d-none d-md-block"
-              />
-            </Col>
-            <Col sm={8}>
-              {'This is a notificaiton'}
-            </Col>
-            </Row>
-          </NavDropdown.Item>
-          <NavDropdown.Item
-            onClick={() => {
-              setExpanded(false);
-              navigate(`/users/${account.user.username}`);
-            }}
-          >
-            <Row>
-            <Col sm={2}>
-              <Image
-                roundedCircle 
-                src={'https://cloak-local.s3.amazonaws.com/uploads/users/2/brians.jpg'}
-                className="d-none d-md-block"
-              />
-            </Col>
-            <Col sm={8}>
-              {'This is a notificaiton'}
-            </Col>
-            </Row>
-          </NavDropdown.Item>
-          <NavDropdown.Item
-            onClick={() => {
-              setExpanded(false);
-              navigate(`/users/${account.user.username}`);
-            }}
-          >
-            <Row>
-            <Col sm={2}>
-              <Image
-                roundedCircle 
-                src={'https://cloak-local.s3.amazonaws.com/uploads/users/2/brians.jpg'}
-                className="d-none d-md-block"
-              />
-            </Col>
-            <Col sm={8}>
-              {'This is a notificaiton'}
-            </Col>
-            </Row>
-          </NavDropdown.Item>
-          <NavDropdown.Item
-            onClick={() => {
-              setExpanded(false);
-              navigate(`/users/${account.user.username}`);
-            }}
-          >
-            <Row>
-            <Col sm={2}>
-              <Image
-                roundedCircle 
-                src={'https://cloak-local.s3.amazonaws.com/uploads/users/2/brians.jpg'}
-                className="d-none d-md-block"
-              />
-            </Col>
-            <Col sm={8}>
-              {'This is a notificaiton'}
-            </Col>
-            </Row>
-          </NavDropdown.Item>
-          <NavDropdown.Item
-            onClick={() => {
-              setExpanded(false);
-              navigate(`/users/${account.user.username}`);
-            }}
-          >
-            <Row>
-            <Col sm={2}>
-              <Image
-                roundedCircle 
-                src={'https://cloak-local.s3.amazonaws.com/uploads/users/2/brians.jpg'}
-                className="d-none d-md-block"
-              />
-            </Col>
-            <Col sm={8}>
-              {'This is a notificaiton'}
-            </Col>
-            </Row>
-          </NavDropdown.Item>
+          {notifyList && notifyList.map((item, index) => (
+            <NavDropdown.Item
+              key={`notification_${index}`}
+              onClick={() => {
+                setExpanded(false);
+                navigate(`/users/${account.user.username}`);
+              }}
+            >
+              <Row style={{ position: 'relative' }}>
+                <Col sm={2}>
+                  <Image
+                    roundedCircle
+                    src={item.action.actor && item.action.actor.image}
+                    className="d-none d-md-block"
+                  />
+                </Col>
+                <Col sm={8}>
+                  <div>
+                    {item.action.actor && item.action.actor.firstName + ' ' + item.action.actor.lastName} {item.action.verb}
+                  </div>
+                  <span className=''>{diffTime(item.created)} ago</span>
+                </Col>
+                {!item.seen && <UnreadIcon />}
+              </Row>
+            </NavDropdown.Item>
+          ))}
         </>
       );
-  }
+  };
+
+  const handleToggle = (toggle) => {
+    if (!toggle && unreadNotify) {
+      notifyList.map(item => {
+        dispatch(updatePartialNotifications({
+          notificationId: item.id,
+          payload: { seen: true }
+        }));
+      })
+    }
+  };
 
   return (
     <StyledNavDropdown
-      title={<MainNavLink><FontAwesomeIcon icon={faComments} /></MainNavLink>}
+      title={<MainNavLink unreadNotify={unreadNotify}><FontAwesomeIcon icon={faBell} /></MainNavLink>}
       id="account-navbar-dropdown"
-      alignLeft
-      onToggle={console.log('test')}
+      onToggle={handleToggle}
     >
-      {renderAuthenticationAction()}
+      {renderNotifyList()}
     </StyledNavDropdown>
   );
 }
 
 NotificationDropdown.propTypes = {
-  // The account state of the user.
   account: PropTypes.object.isRequired,
-
-  // Action to fire to let the navbar know that the dropdown is expanded.
   setExpanded: PropTypes.func.isRequired,
 };
 

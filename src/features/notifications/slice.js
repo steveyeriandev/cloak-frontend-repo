@@ -9,7 +9,7 @@ import {
 const initialState = {
   status: "idle",
   total: 0,
-  current: 0,
+  current: 0
 };
 
 const notificationInitialState = {
@@ -19,7 +19,7 @@ const notificationInitialState = {
   entities: {},
 
   // Used to store a single project detail data.
-  notifications: {},
+  notifications: [],
 
 };
 
@@ -37,26 +37,17 @@ const notificationSlice = createSlice({
   },
   extraReducers: {
     [fetchNotifications.fulfilled]: (state, action) => {
-      state.notifications = {
-        ...state.detail,
-        ...action.payload,
-      };
+      state.notifications = action.payload;
     },
 
     [updateNotifications.fulfilled]: (state, action) => {
-      // When we update a project, we need to update the project detail state.
-      state.notifications = {
-        ...state.detail,
-        ...action.payload,
-      };
+      const idx = state.notifications.findIndex((item) => item.id === action.payload.id);
+      state.notifications[idx] = action.payload;
     },
 
     [updatePartialNotifications.fulfilled]: (state, action) => {
-      // When we update a project, we need to update the project detail state.
-      state.notifications = {
-        ...state.detail,
-        ...action.payload,
-      };
+      const idx = state.notifications.findIndex((item) => item.id === action.payload.id);
+      state.notifications[idx] = action.payload;
     },
   }
 });

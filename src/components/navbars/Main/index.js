@@ -8,10 +8,7 @@ import { Link, navigate } from "@reach/router";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faGraduationCap,
-  faPlusCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { faGraduationCap, faPlusCircle, } from "@fortawesome/free-solid-svg-icons";
 
 import ProjectSearchControl from "components/controls/ProjectSearch";
 import AccountDropdown from "components/dropdowns/Account";
@@ -124,19 +121,19 @@ function MainNavbar({ shadow }) {
             </SearchContainer>
             <NavButtonContainer>
               {user.enrollments &&
-                (user.enrollments.length > 0 || user.projects.length > 0) && (
-                  <Nav.Link
-                    as={Button}
-                    onClick={() =>
-                      navigate(`/users/${accountState.user.username}`)
-                    }
-                    variant="secondary text-dark"
-                    className="d-none d-md-block"
-                    style={{ width: 120 }}
-                  >
-                    <FontAwesomeIcon icon={faGraduationCap} /> My classes
-                  </Nav.Link>
-                )}
+              (user.enrollments.length > 0 || user.projects.length > 0) && (
+                <Nav.Link
+                  as={Button}
+                  onClick={() =>
+                    navigate(`/users/${accountState.user.username}`)
+                  }
+                  variant="secondary text-dark"
+                  className="d-none d-md-block"
+                  style={{ width: 120 }}
+                >
+                  <FontAwesomeIcon icon={faGraduationCap} /> My classes
+                </Nav.Link>
+              )}
 
               <NotificationDropdown
                 account={accountState}

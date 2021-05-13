@@ -22,10 +22,19 @@ class ApiService {
   list(parameters) {
     /* Lists projects.
 
-       :parameters Object: Query parameters to pass for filtering.
+       :param parameters Object: Query parameters to pass for filtering.
     */
     let url = this.listUrl;
     if (parameters) url = appendUrlParameters(url, parameters);
+
+    return axiosInstance.get(url);
+  }
+
+  getNextUrl(url) {
+    /* Fetches data directly from a url, used primarily with pagination which gives the next url.
+
+       :param url string: The url that should be fetched.
+    */
 
     return axiosInstance.get(url);
   }

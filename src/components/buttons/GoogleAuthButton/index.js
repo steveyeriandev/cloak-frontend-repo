@@ -47,7 +47,8 @@ function GoogleAuthButton({ closeModal }) {
   return (
     <GoogleLogin
       clientId={googleClientId}
-      text="Login with google"
+      buttonText="Google"
+      className="px-5"
       onSuccess={responseGoogleSuccess}
       onFailure={responseGoogleFailure}
       cookiePolicy={"single_host_origin"}

@@ -5,7 +5,7 @@ import Image from "react-bootstrap/Image";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSave,
+  faChevronRight,
   faArrowRight,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
@@ -70,15 +70,24 @@ const TapThroughContainer = styled.div`
   flex-grow: 1;
 `;
 
-function BucketUploadImageSetChoiceModal({ bucketUpload, ...props }) {
+function BucketUploadImageSetChoiceModal({
+  bucketUpload,
+  showConfirmShareModal,
+  ...props
+}) {
   // Gives the user a choice of what layout they'd like their image set to be displayed in.
   const dispatch = useDispatch();
   const [isTapThrough, setIsTapThrough] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  function transitionToShare() {
+    props.onHide();
+    showConfirmShareModal();
+  }
+
   async function handleSave() {
     // If the user wants a webcomic version, then we'll need to update the bucketUpload instance.
-    if (isTapThrough) return props.onHide();
+    if (isTapThrough) return transitionToShare();
 
     setIsUpdating(true);
 
@@ -92,10 +101,8 @@ function BucketUploadImageSetChoiceModal({ bucketUpload, ...props }) {
     );
 
     setIsUpdating(false);
-    props.onHide();
+    transitionToShare();
   }
-
-  console.log("rendering... tap through?", isTapThrough);
 
   return (
     <BaseModal {...props}>
@@ -136,7 +143,7 @@ function BucketUploadImageSetChoiceModal({ bucketUpload, ...props }) {
           isLoading={isUpdating}
           width={150}
         >
-          <FontAwesomeIcon icon={faSave} /> Save
+          Continue <FontAwesomeIcon icon={faChevronRight} />
         </LoadingButton>
       </ButtonContainer>
     </BaseModal>
@@ -146,6 +153,9 @@ function BucketUploadImageSetChoiceModal({ bucketUpload, ...props }) {
 BucketUploadImageSetChoiceModal.propTypes = {
   // The bucket upload that will be updated.
   bucketUpload: PropTypes.object.isRequired,
+
+  // Transition to the confirm share modal, which needs to be called from outside of this modal.
+  showConfirmShareModal: PropTypes.func.isRequired,
 };
 
 export default BucketUploadImageSetChoiceModal;

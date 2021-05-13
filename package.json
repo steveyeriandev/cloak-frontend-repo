@@ -33,6 +33,7 @@
     "react-facebook-pixel": "^1.0.4",
     "react-google-login": "^5.1.25",
     "react-hook-form": "^6.13.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-linkify": "^1.0.0-alpha",
     "react-modal-hook": "^3.0.0",
     "react-moment": "^1.1.1",
@@ -40,6 +41,7 @@
     "react-redux": "^7.2.2",
     "react-scripts": "4.0.1",
     "react-select": "^4.1.0",
+    "react-string-replace": "^0.4.4",
     "react-toast-notifications": "^2.4.0",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
@@ -52,6 +54,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "deploy-prod": "REACT_APP_ENV='production' npm run build && aws s3 sync build/ s3://cloak-app-prod --profile cloak-frontend && aws cloudfront create-invalidation --distribution-id E2Z8SQ0AATLWG8 --paths /index.html --profile cloak-frontend",
+    "deploy-staging": "REACT_APP_ENV='staging' npm run build && aws s3 sync build/ s3://cloak-app-staging --profile cloak-frontend && aws cloudfront create-invalidation --distribution-id E21DM8OVDABKLV --paths /index.html --profile cloak-frontend",
     "prepare": "husky install"
   },
   "eslintConfig": {

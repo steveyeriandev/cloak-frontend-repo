@@ -8,6 +8,14 @@ const Wrapper = styled.div`
   display: block;
   display: flex;
   justify-content: center;
+
+  button {
+    margin-bottom: 20px;
+
+    > span {
+      font-size: 18px;
+    }
+  }
 `;
 
 function SocialAuthenticationContainer({ closeModal }) {

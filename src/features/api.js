@@ -1,7 +1,11 @@
 import axios from "axios";
 
 function getBaseUrl() {
-  return "http://localhost:8000/";
+  if (process.env.REACT_APP_ENV === "production")
+    return "https://api.radhowtoclass.com/";
+  else if (process.env.REACT_APP_ENV === "staging")
+    return "https://api-staging.radhowtoclass.com/";
+  else return "http://localhost:8000/";
 }
 
 export const baseUrl = getBaseUrl();

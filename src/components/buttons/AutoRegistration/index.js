@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
-import { useModal } from "react-modal-hook";
 import { useToasts } from "react-toast-notifications";
 
 import LoadingButton from "components/buttons/Loading";
-import AuthenticationModal from "components/modals/Authentication";
 import { autoRegister } from "features/tiers/thunks";
 import { enrollmentStatus } from "utils/enums";
+import useAuthenticationModal from "hooks/AuthModal";
 
 function AutoRegistrationButton({ registrationTier }) {
   // Automatically registers a user for a given registration tier.
@@ -15,9 +14,7 @@ function AutoRegistrationButton({ registrationTier }) {
   const [isLoading, setIsLoading] = useState(false);
   const isAuthenticated = useSelector((state) => state.account.token !== "");
   const user = useSelector((state) => state.account.user);
-  const [showAuthModal, hideAuthModal] = useModal(() => (
-    <AuthenticationModal onHide={hideAuthModal} />
-  ));
+  const showAuthModal = useAuthenticationModal();
   const dispatch = useDispatch();
   const { addToast } = useToasts();
 

@@ -35,17 +35,19 @@ const accountsSlice = createSlice({
       state.isLoading = true;
     },
     [loginUser.fulfilled]: (state, action) => {
-      const { accessToken, refreshToken } = action.payload;
+      const { accessToken, refreshToken, user } = action.payload;
       state.token = accessToken;
       state.refresh = refreshToken;
+      state.user = user;
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${accessToken}`;
     },
     [loginGoogleUser.fulfilled]: (state, action) => {
-      const { accessToken, refreshToken } = action.payload;
+      const { accessToken, refreshToken, user } = action.payload;
       state.token = accessToken;
       state.refresh = refreshToken;
+      state.user = user;
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${accessToken}`;

@@ -4,12 +4,12 @@ import { useModal } from "react-modal-hook";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 
-import ImageStackModal from "components/modals/ImageStackCarousel";
+import BucketUploadModal from "components/modals/BucketUpload";
+import ImageStackCarousel from "components/carousels/ImageStack";
 import RemoveOverlayIcon from "components/general/RemoveOverlayIcon";
 import DeleteBucketUploadModal from "components/modals/DeleteStackConfirmation";
 import WebComicModal from "components/modals/WebComic";
 import { fetchBucketUpload } from "features/bucketUploads/thunks";
-import { setCurrent, removeCurrent } from "features/bucketUploads/slice";
 import { bucketUploadType } from "utils/enums";
 import StackImage from "../Display/StackImages";
 import FileUploadDisplay from "../Display/FileUploadDisplay";
@@ -41,13 +41,15 @@ function BucketUpload({ bucketUpload }) {
      4) An audio upload will create an audio player to listen to the file
   */
   const dispatch = useDispatch();
-  const [showImageStackModal, hideImageStackModal] = useModal(() => {
-    function onHide() {
-      hideImageStackModal();
-      dispatch(removeCurrent());
-    }
-
-    return <ImageStackModal show={true} onHide={onHide} />;
+  const [showBucketUploadModal, hideBucketUploadModal] = useModal(() => {
+    return (
+      <BucketUploadModal
+        bucketUpload={bucketUpload}
+        onHide={hideBucketUploadModal}
+      >
+        <ImageStackCarousel bucketUpload={bucketUpload} />
+      </BucketUploadModal>
+    );
   });
   const [showDeleteConfirmationModal, hideDeleteConfirmationModal] = useModal(
     () => {
@@ -71,9 +73,8 @@ function BucketUpload({ bucketUpload }) {
 
   function launchImageStackCarousel() {
     // Opens the carousel to view the sorted images in the bucket upload.
-    dispatch(setCurrent(bucketUpload));
     dispatch(fetchBucketUpload(bucketUpload.id));
-    showImageStackModal(bucketUpload);
+    showBucketUploadModal(bucketUpload);
   }
 
   function renderDeleteSection() {

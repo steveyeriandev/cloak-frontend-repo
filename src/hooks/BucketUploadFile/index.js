@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { useModal } from "react-modal-hook";
 
-import BucketUploadImageSetChoiceModal from "components/modals/BucketUploadImageSetChoice";
+import useFeedShare from "hooks/FeedShare";
 import { bucketUploadType } from "utils/enums";
 import { createBucketUpload } from "features/bucketUploads/thunks";
 import { createStackImage } from "features/stackImages/thunks";
@@ -25,29 +25,18 @@ function useBucketUploadFile(files) {
      1) Image stack - multiple image files that will be uploaded together
      2) PDF file
      3) Video file
-
-     TODO: much of this upload logic is copied with the `BucketUploadDropzone` component, it could
-     possibly be moved out into a hook...?
+     4) Audio file
   */
   const dispatch = useDispatch();
   const { addToast } = useToasts();
   const currentBucket = useSelector((state) => state.buckets.current);
+  const [uploadId, setUploadId] = useState();
+  const showConfirmShareModal = useFeedShare(
+    "bucketupload",
+    "Upload Successful!",
+    uploadId
+  );
   const [bucketUpload, setBucketUpload] = useState(null);
-
-  console.log("bucket upload...", bucketUpload);
-
-  const [
-    showBucketUploadFollowupModal,
-    hideBucketUploadFollowupModal,
-  ] = useModal(() => {
-    console.log("returning modal...", bucketUpload);
-    return (
-      <BucketUploadImageSetChoiceModal
-        onHide={hideBucketUploadFollowupModal}
-        bucketUpload={bucketUpload}
-      />
-    );
-  }, [bucketUpload]);
 
   // const mb = 1048576;
   // const chunkSize = mb * 0.1;
@@ -64,9 +53,9 @@ function useBucketUploadFile(files) {
   async function _dispatchStackImage(formData) {
     // Need to pull this dispatch action out to have async at top level.
     const action = await dispatch(createStackImage(formData));
-    if (action.type === "CREATE_STACK_IMAGE/fulfilled")
+    if (action.type === "CREATE_STACK_IMAGE/fulfilled") {
       dispatch(incrementUploadCount());
-    else {
+    } else {
       addToast(
         "There was an error uploading an image, please verify all files are valid image files.",
         { autoDismiss: true, appearance: "error", autoDismissTimeout: 5000 }
@@ -79,7 +68,6 @@ function useBucketUploadFile(files) {
     // Creates the Base bucket upload object and returns the action.
     const action = await dispatch(createBucketUpload(formData));
     setBucketUpload(action.payload);
-    showBucketUploadFollowupModal();
     return action;
   }
 
@@ -89,7 +77,7 @@ function useBucketUploadFile(files) {
 
     const action = await _createBucketUpload(formData);
     if (action.type === "CREATE_BUCKET_UPLOAD/rejected") {
-      addToast("Error creating new image stack.", { appearance: "error" });
+      addToast("Error creating new bucket upload.", { appearance: "error" });
     } else if (action.type === "CREATE_BUCKET_UPLOAD/fulfilled") {
       // The stack was created, now we can upload the images by looping through the files.
       dispatch(createUploadSession({ total: files.length }));
@@ -101,6 +89,8 @@ function useBucketUploadFile(files) {
         formData.append("image", file);
         _dispatchStackImage(formData);
       });
+
+      setUploadId(action.payload.id);
     }
   }
 
@@ -115,6 +105,8 @@ function useBucketUploadFile(files) {
       addToast("Error creating new upload.", { appearance: "error" });
     } else if (action.type === "CREATE_BUCKET_UPLOAD/fulfilled") {
       addToast("Upload completed successfully.", { appearance: "success" });
+      setUploadId(action.payload.id);
+      showConfirmShareModal();
     }
   }
 

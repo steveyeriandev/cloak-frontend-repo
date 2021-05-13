@@ -34,8 +34,8 @@ const AuthenticationModal = (props) => {
   if (authMode === "login") {
     return (
       <BaseModal {...props}>
-        <ModalHeader title="Log in" closeButton />
-        <Modal.Body>
+        <ModalHeader title="Log in with" />
+        <Modal.Body className="pt-0">
           <LoginForm closeModal={props.onHide} />
           <AuthOptionsContainer>
             <div>

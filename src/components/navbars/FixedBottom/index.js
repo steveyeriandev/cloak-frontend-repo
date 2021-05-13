@@ -3,7 +3,11 @@ import Navbar from "react-bootstrap/Navbar";
 import styled from "styled-components";
 
 const StyledNavbar = styled(Navbar)`
-  z-index: 1;
+  visibility: hidden;
+
+  .nav-item {
+    visibility: visible;
+  }
 
   @media (min-width: ${(props) => props.theme.smBreakpoint}) {
     margin-bottom: 70px;

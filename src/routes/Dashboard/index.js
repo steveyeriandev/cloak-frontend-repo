@@ -10,7 +10,7 @@ const DashboardRouteContainer = styled.div`
 `;
 
 const InnerWrapper = styled.div`
-  padding-top: 90px;
+  padding-top: 70px;
   min-height: 100vh;
 `;
 

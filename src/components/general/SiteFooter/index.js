@@ -36,7 +36,7 @@ function SiteFooter() {
       <FormModal title="Contact us" onHide={hideContactModal}>
         <EmailForm
           closeModal={hideContactModal}
-          email={{ to: "support@asfd.com" }}
+          email={{ to: "support@radhowtoschool.com" }}
           apiUrl={supportEmailUrl}
           toDisabled
         />

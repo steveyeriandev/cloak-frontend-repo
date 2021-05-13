@@ -47,7 +47,7 @@ function AllProjectsRoute() {
     _fetchProjects();
   }, []);
 
-  if (isLoading) return <LoadingContainer />;
+  if (isLoading) return <LoadingContainer text="Loading projects" />;
 
   return (
     <Container>

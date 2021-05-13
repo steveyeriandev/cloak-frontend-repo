@@ -22,7 +22,7 @@ const StyledCheck = styled(Form.Check)`
   }
 `;
 
-function PublicToggle({ project }) {
+function PublicToggle({ project, setPublicAction }) {
   // Provides a component to toggle if a project is public or private.
   const dispatch = useDispatch();
 
@@ -50,6 +50,10 @@ function PublicToggle({ project }) {
       },
     };
     await dispatch(updateProject(actionPayload));
+
+    // After the project has been made public, we should ask the user if they want to share the
+    // project if they haven't already.
+    if (!project.isPublic) setPublicAction();
   }
 
   return (
@@ -77,6 +81,13 @@ function PublicToggle({ project }) {
 PublicToggle.propTypes = {
   // The project for which we're toggling.
   project: PropTypes.object.isRequired,
+
+  // Action to take when setting the project as public.
+  setPublicAction: PropTypes.func,
+};
+
+PublicToggle.defaultProps = {
+  setPublicAction: () => {},
 };
 
 export default PublicToggle;

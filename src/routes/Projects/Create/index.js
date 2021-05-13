@@ -24,13 +24,8 @@ const ButtonContainer = styled.div`
 function ProjectCreateRoute() {
   // Provides a route for the project creation process.
 
-  // TODO: For now, just create everything as live class.
-  const [selectedTemplate, setSelectedTemplate] = useState(
-    projectTemplate.liveClass
-  );
-
-  // TODO: For now, there is no template selection.
-  const [activeSection, setActiveSection] = useState("projectForm");
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [activeSection, setActiveSection] = useState("chooseTemplate");
 
   function renderSection() {
     // Shows a different section depending on where the user is in the process.

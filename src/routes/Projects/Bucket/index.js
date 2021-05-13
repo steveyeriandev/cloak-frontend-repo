@@ -21,7 +21,8 @@ function BucketRoute({ bucketSlug }) {
   Route to display the content of a project bucket.
 
   The main goal of this component is to load the full data for the bucket and then pass that data
-  down into the proper bucket component, determined by its `kind` field.
+  down into the proper bucket component, determined by its `kind` field. We also handle the project
+  info section, which isn't technically a bucket but it is presented to the user as such.
   */
   const dispatch = useDispatch();
   const bucketState = useSelector((state) => state.buckets);

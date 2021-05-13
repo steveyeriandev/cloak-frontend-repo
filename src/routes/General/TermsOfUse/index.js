@@ -57,7 +57,7 @@ function TermsOfUseDocument() {
       <p style={{ marginLeft: "0.5in", marginBottom: "0.14in" }}>
         <b>Application</b>
         means any website provided by the Company (including but not limited to
-        www.asfd.com), together with all features, services, programs
+        www.radhowtoclass.com), together with all features, services, programs
         and applications related thereto, that is used or downloaded by You on a
         Device, named RadHowToSchool
       </p>
@@ -626,8 +626,8 @@ function TermsOfUseDocument() {
       <p style={{ marginBottom: "0.14in" }}>
         The Company collects, stores, maintains, and shares information about
         You in accordance with Our Privacy Policy:{" "}
-        <a href="www.asfd.com/privacy-policy">
-          www.asfd.com/privacy-policy
+        <a href="www.radhowtoclass.com/privacy-policy">
+          www.radhowtoclass.com/privacy-policy
         </a>
       </p>
       <p style={{ marginBottom: "0.14in" }}>
@@ -1061,7 +1061,7 @@ function TermsOfUseDocument() {
       <ul>
         <li>
           <p style={{ marginBottom: "0.14in" }}>
-            By email: support@asfd.com
+            By email: support@radhowtoclass.com
           </p>
         </li>
       </ul>

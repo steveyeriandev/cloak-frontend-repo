@@ -36,6 +36,7 @@ import {
 } from "features/projects/slice";
 import { updateProjectImage } from "features/projects/thunks";
 import { useDeleteMediaItem } from "hooks/MediaItems";
+import useFeedShare from "hooks/FeedShare";
 import { isProjectAdmin } from "utils/projects";
 import ClassInfoHeader from "./ClassInfoHeader";
 
@@ -56,10 +57,16 @@ const ProjectDescriptionContainer = styled.div`
   margin-bottom: ${(props) => props.theme.spacingLg};
 `;
 
-function InfoBucket({ project, actAsContext }) {
+function ProjectInfoBucket({ project, actAsContext }) {
   /* Provides the "bucket" (It's not actually a bucket in data, but shown as if it were) for showing
      the general project-level data and allows users to register for tiers.
   */
+  const showConfirmShareModal = useFeedShare(
+    "project",
+    "Project is public!",
+    project.id
+  );
+
   const [showImageBlockModal, hideImageBlockModal] = useModal(() => {
     function hide() {
       dispatch(deactivateImageBlock());
@@ -246,7 +253,7 @@ function InfoBucket({ project, actAsContext }) {
       <Row className="h-100">
         <Col sm={12} md={8}>
           {isProjectAdmin(user, project) && (
-            <ProjectAdminEditSection className="d-flex align-items-center justify-space-between border">
+            <ProjectAdminEditSection className="d-flex align-items-center justify-space-between border mt-4">
               <span className="w-50">
                 Currently viewing as
                 <InfoTooltip
@@ -270,7 +277,12 @@ function InfoBucket({ project, actAsContext }) {
           </ProjectTitle>
           {shouldViewAdminItems && (
             <ProjectAdminEditSection>
-              <ProjectPublicToggle project={project} />
+              <ProjectPublicToggle
+                project={project}
+                setPublicAction={
+                  !project.hasBeenShared ? showConfirmShareModal : () => {}
+                }
+              />
             </ProjectAdminEditSection>
           )}
           <ClassInfoHeader
@@ -300,7 +312,7 @@ function InfoBucket({ project, actAsContext }) {
   );
 }
 
-InfoBucket.propTypes = {
+ProjectInfoBucket.propTypes = {
   // The project for which we're viewing the info bucket.
   project: PropTypes.object.isRequired,
 
@@ -308,4 +320,4 @@ InfoBucket.propTypes = {
   actAsContext: PropTypes.object.isRequired,
 };
 
-export default InfoBucket;
+export default ProjectInfoBucket;

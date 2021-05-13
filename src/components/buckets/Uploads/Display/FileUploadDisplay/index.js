@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useModal } from "react-modal-hook";
 
-import VideoModal from "components/modals/Video";
+import BucketUploadModal from "components/modals/BucketUpload";
 import { bucketUploadType } from "utils/enums";
 import PdfIcon from "images/icons/pdf.png";
 import VideoIcon from "images/icons/video.png";
@@ -34,15 +34,46 @@ const InnerWrapper = styled.div`
   flex-direction: column;
 `;
 
+const StyledPdfImage = styled.img`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 function FileUploadDisplay({ bucketUpload }) {
-  /* Generic component to show a file upload in the upload container. */
-  const [showVideoModal, hideVideoModal] = useModal(() => {
+  const [showUploadModal, hideUploadModal] = useModal(() => {
+    function getModalContent() {
+      // Returns the content that should be displayed in the modal, which depends on the upload type.
+      switch (bucketUpload.kind) {
+        case bucketUploadType.video:
+          return (
+            <video autoPlay controls name="media" className="w-100">
+              <source src={bucketUpload.uploadFile} type="video/mp4" />
+            </video>
+          );
+        case bucketUploadType.pdf:
+          return (
+            <StyledPdfImage
+              src={PdfIcon}
+              alt=""
+              style={{ width: "30%" }}
+              onClick={openPdf}
+              className="m-5"
+            />
+          );
+        case bucketUploadType.audio:
+          return (
+            <audio controls className="m-5">
+              <source src={bucketUpload.uploadFile} type="audio/mpeg" />
+            </audio>
+          );
+      }
+    }
+
     return (
-      <VideoModal
-        show={true}
-        onHide={hideVideoModal}
-        bucketUpload={bucketUpload}
-      />
+      <BucketUploadModal onHide={hideUploadModal} bucketUpload={bucketUpload}>
+        {getModalContent()}
+      </BucketUploadModal>
     );
   });
 
@@ -52,7 +83,9 @@ function FileUploadDisplay({ bucketUpload }) {
     return bucketUpload.uploadFile.slice(filenameStart);
   }
 
-  function openPdf() {
+  function openPdf(e) {
+    e.stopPropagation();
+
     // Opens the pdf file in new tab.
     const newWindow = window.open(
       bucketUpload.uploadFile,
@@ -68,10 +101,17 @@ function FileUploadDisplay({ bucketUpload }) {
       case bucketUploadType.video:
         return <img src={VideoIcon} alt="" style={{ width: "50%" }} />;
       case bucketUploadType.pdf:
-        return <img src={PdfIcon} alt="" style={{ width: "50%" }} />;
+        return (
+          <img
+            src={PdfIcon}
+            alt=""
+            style={{ width: "50%" }}
+            onClick={openPdf}
+          />
+        );
       case bucketUploadType.audio:
         return (
-          <audio controls>
+          <audio controls onClick={(e) => e.stopPropagation()}>
             <source src={bucketUpload.uploadFile} type="audio/mpeg" />
           </audio>
         );
@@ -80,20 +120,8 @@ function FileUploadDisplay({ bucketUpload }) {
     }
   }
 
-  function handleClick() {
-    // Returns the proper handler depending on the upload type.
-    switch (bucketUpload.kind) {
-      case bucketUploadType.video:
-        return showVideoModal();
-      case bucketUploadType.pdf:
-        return openPdf();
-      default:
-        return () => {};
-    }
-  }
-
   return (
-    <Wrapper onClick={handleClick} createdBy={bucketUpload.createdBy}>
+    <Wrapper onClick={showUploadModal} createdBy={bucketUpload.createdBy}>
       <InnerWrapper>
         <div className="mb-3">{getFilename()}</div>
         <div>{getContent()}</div>

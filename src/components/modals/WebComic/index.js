@@ -1,56 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import Image from "react-bootstrap/Image";
 import styled from "styled-components";
 
-import BucketUploadService from "features/bucketUploads/service";
 import LoadingContainer from "components/loading/Container";
+import CommentContainer from "components/comments/Container";
+import BucketUploadHeader from "components/buckets/Uploads/Header";
+import useFetchBucketUploadImages from "hooks/FetchBucketUploadImages";
+import useGetContentTypeObj from "hooks/GetContentTypeObj";
 import BaseModal from "../Base";
 
 const ImageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+  height: 80vh;
+  overflow-y: scroll;
+
+  @media (max-width: ${(props) => props.theme.smBreakpoint}) {
+    height: 60vh;
+  }
 
   > img {
     &:first-of-type {
       border-top-left-radius: ${(props) => props.theme.borderRadius};
       border-top-right-radius: ${(props) => props.theme.borderRadius};
     }
-
-    &:last-of-type {
-      border-bottom-left-radius: ${(props) => props.theme.borderRadius};
-      border-bottom-right-radius: ${(props) => props.theme.borderRadius};
-    }
   }
 `;
 
 function WebComicModal({ bucketUpload, ...props }) {
   // Displays an image set in the form of a web comic (vertical scroll)
-  const [isLoading, setIsLoading] = useState(false);
-  const [images, setImages] = useState([]);
-
-  useEffect(() => {
-    const service = new BucketUploadService();
-    async function fetchImages() {
-      // Fetches the image data for the comic.
-      const response = await service.fetch(bucketUpload.id);
-      setImages(response.data.images);
-      setIsLoading(false);
-    }
-
-    setIsLoading(true);
-    fetchImages();
-  }, [bucketUpload.id]);
-
-  if (isLoading) return <LoadingContainer />;
+  const [isLoading, images] = useFetchBucketUploadImages(bucketUpload);
+  const contentTypeObj = useGetContentTypeObj("bucketupload");
 
   function renderImages() {
-    return images.map((image) => <Image src={image.image} alt="" />);
+    if (isLoading) return <LoadingContainer />;
+
+    return images.map((image) => <Image src={image.image} fluid alt="" />);
   }
 
   return (
-    <BaseModal {...props} size="lg">
+    <BaseModal {...props} size="md">
+      <BucketUploadHeader bucketUpload={bucketUpload} />
       <ImageContainer>{renderImages()}</ImageContainer>
+      <CommentContainer
+        contentObject={bucketUpload}
+        contentTypeObj={contentTypeObj}
+      />
     </BaseModal>
   );
 }

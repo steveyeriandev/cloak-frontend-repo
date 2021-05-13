@@ -10,6 +10,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 50px;
+  margin-bottom: 50px;
 `;
 
 function LoadingContainer({ text, ...props }) {

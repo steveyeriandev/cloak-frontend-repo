@@ -11,16 +11,6 @@ const initialState = {
 const bucketUploadsSlice = createSlice({
   name: "bucketUploads",
   initialState,
-  reducers: {
-    setCurrent(state, action) {
-      // Current stack that we're navigating through.
-      state.current = { ...state.current, ...action.payload };
-    },
-    removeCurrent(state, action) {
-      // Remove the current stack when we're done navigating.
-      return initialState;
-    },
-  },
   extraReducers: {
     [fetchBucketUpload.pending]: (state) => {
       state.current.isLoading = true;

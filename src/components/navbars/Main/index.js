@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { Link, navigate } from "@reach/router";
+import Container from "react-bootstrap/Container";
+import { navigate } from "@reach/router";
 import styled from "styled-components";
 import PropTypes from "prop-types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faHouseUser,
   faGraduationCap,
   faPlusCircle,
 } from "@fortawesome/free-solid-svg-icons";
@@ -16,25 +16,19 @@ import {
 import ProjectSearchControl from "components/controls/ProjectSearch";
 import AccountDropdown from "components/dropdowns/Account";
 import MobileBucketNavigation from "components/navbars/MobileBucketNavigation";
-import HomeIcon from "images/icons/home.png";
+import MainLinkIcon from "../MainLinkIcon";
 
-const StyledNavbar = styled(Navbar)`
+const RightNavbar = styled(Navbar)`
   box-shadow: 0px 1px 0px ${(props) => props.theme.gray300};
 `;
 
-const StyledNav = styled(Nav)`
+const RightNav = styled(Nav)`
+  // Inner nav that's on the right side of the navbar.
+
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  flex-grow: 1;
-
-  > * {
-    margin: 0 5px;
-  }
-
-  > a {
-    padding: 0;
-  }
+  flex-basis: 50%;
 `;
 
 const StyledCollapse = styled(Navbar.Collapse)`
@@ -43,39 +37,10 @@ const StyledCollapse = styled(Navbar.Collapse)`
   }
 `;
 
-const StyledHomeIcon = styled.img`
-  @media (max-width: ${(props) => props.theme.smBreakpoint}) {
-    width: auto;
-  }
-
-  padding: 10px;
-  background-color: ${(props) => props.theme.gray300};
-  border-radius: ${(props) => props.theme.borderRadius};
-`;
-
 const StyledBrand = styled(Navbar.Brand)`
   &:hover {
     cursor: pointer;
   }
-`;
-
-const MainNavLink = styled(Nav.Link)`
-  background-color: ${(props) => props.theme.gray300};
-  border-radius: ${(props) => props.theme.borderRadius};
-  color: black;
-  padding: 5px 10px !important;
-  font-size: 1.3rem;
-
-  &:hover {
-    color: black;
-  }
-`;
-
-const NavButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-direction: row;
 `;
 
 const SearchContainer = styled.div`
@@ -84,8 +49,9 @@ const SearchContainer = styled.div`
   }
 
   @media (min-width: ${(props) => props.theme.smBreakpoint}) {
-    width: 40%;
-    margin-left: 15%;
+    justify-content: center;
+    flex-basis: 50%;
+    margin-left: 20%;
   }
 `;
 
@@ -95,9 +61,10 @@ function MainNavbar({ shadow }) {
   const [expanded, setExpanded] = useState(false);
 
   const { user } = accountState;
+  const isAuthenticated = accountState.token !== "";
 
   return (
-    <StyledNavbar
+    <RightNavbar
       bg="white"
       fixed="top"
       expand="lg"
@@ -113,51 +80,47 @@ function MainNavbar({ shadow }) {
           onClick={() => setExpanded(!expanded)}
         />
         <StyledCollapse id="basic-navbar-nav">
-          <StyledNav>
+          <SearchContainer>
+            <ProjectSearchControl
+              className="mr-2"
+              placeholder="Search projects..."
+            />
+          </SearchContainer>
+          <RightNav className="ml-auto">
             <MobileBucketNavigation collapse={() => setExpanded(false)} />
-            <SearchContainer>
-              <ProjectSearchControl
-                className="mr-2"
-                placeholder="Search projects..."
+            <MainLinkIcon
+              icon={faHouseUser}
+              to="/feed"
+              onClick={() => setExpanded(false)}
+            />
+            {isAuthenticated && (
+              <MainLinkIcon
+                to="/projects/create"
+                onClick={() => setExpanded(false)}
+                icon={faPlusCircle}
               />
-            </SearchContainer>
-            <NavButtonContainer>
-              {user.enrollments &&
-                (user.enrollments.length > 0 || user.projects.length > 0) && (
-                  <Nav.Link
-                    as={Button}
-                    onClick={() =>
-                      navigate(`/users/${accountState.user.username}`)
-                    }
-                    variant="secondary text-dark"
-                    className="d-none d-md-block"
-                    style={{ width: 120 }}
-                  >
-                    <FontAwesomeIcon icon={faGraduationCap} /> My classes
-                  </Nav.Link>
-                )}
-              <Nav.Link as={Link} to="/">
-                <StyledHomeIcon src={HomeIcon} alt="Rad how to school home" />
-              </Nav.Link>
-              {user.isApproved && (
-                <MainNavLink
-                  as={Link}
-                  to="/projects/create"
-                  className="ml-2"
-                  onClick={() => setExpanded(false)}
+            )}
+            <MainLinkIcon
+              icon={faGraduationCap}
+              to="/projects"
+              onClick={() => setExpanded(false)}
+            />
+            {user.enrollments &&
+              (user.enrollments.length > 0 || user.projects.length > 0) && (
+                <Button
+                  variant="light"
+                  onClick={() =>
+                    navigate(`/users/${accountState.user.username}`)
+                  }
                 >
-                  <FontAwesomeIcon icon={faPlusCircle} />
-                </MainNavLink>
+                  My classes
+                </Button>
               )}
-              <AccountDropdown
-                account={accountState}
-                setExpanded={setExpanded}
-              />
-            </NavButtonContainer>
-          </StyledNav>
+            <AccountDropdown account={accountState} setExpanded={setExpanded} />
+          </RightNav>
         </StyledCollapse>
       </Container>
-    </StyledNavbar>
+    </RightNavbar>
   );
 }
 

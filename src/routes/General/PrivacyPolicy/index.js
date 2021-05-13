@@ -167,7 +167,7 @@ function PrivacyPolicyRoute() {
       <p style={{ marginLeft: "0.5in", marginBottom: "0.14in" }}>
         <b>Website </b>
         refers to Rad How To School, accessible from{" "}
-        <a href="www.asfd.com">www.asfd.com</a>
+        <a href="www.radhowtoclass.com">www.radhowtoclass.com</a>
       </p>
       <p style={{ marginLeft: "0.5in", marginBottom: "0.14in" }}>
         <b>You </b> means the individual accessing or using the Service, or the
@@ -1474,7 +1474,7 @@ function PrivacyPolicyRoute() {
       <ul>
         <li>
           <p style={{ marginBottom: "0.14in" }}>
-            By email: asfd@gmail.com
+            By email: radhowtoschool@gmail.com
           </p>
         </li>
       </ul>
@@ -1752,7 +1752,7 @@ function PrivacyPolicyRoute() {
       <ul>
         <li>
           <p style={{ marginBottom: "0.14in" }}>
-            By email: asfd@gmail.com
+            By email: radhowtoschool@gmail.com
           </p>
         </li>
       </ul>

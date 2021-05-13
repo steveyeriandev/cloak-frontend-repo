@@ -1,20 +1,19 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import Carousel from "react-bootstrap/Carousel";
 import Image from "react-bootstrap/Image";
 
 import BaseCarousel from "components/carousels/Base";
 import CarouselCaption from "components/carousels/Caption";
 import LoadingContainer from "components/loading/Container";
+import useFetchBucketUploadImages from "hooks/FetchBucketUploadImages";
 
-function ImageStackCarousel() {
-  const stack = useSelector((state) => state.bucketUploads.current);
+function ImageStackCarousel({ bucketUpload }) {
+  // Carousel that allows us to tap through an image stack.
+  const [isLoading, images] = useFetchBucketUploadImages(bucketUpload);
+
+  if (isLoading) return <LoadingContainer />;
 
   function renderImages() {
-    const { images } = stack;
-
-    if (images === undefined) return null;
-
     return images.map((image, index) => {
       return (
         <Carousel.Item key={image.id}>
@@ -28,8 +27,6 @@ function ImageStackCarousel() {
       );
     });
   }
-
-  if (stack.isLoading) return <LoadingContainer className="mb-5" />;
 
   return <BaseCarousel>{renderImages()}</BaseCarousel>;
 }

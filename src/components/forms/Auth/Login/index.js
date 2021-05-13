@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 
 import { loginUser } from "features/accounts/thunks";
+import LineText from "components/general/LineText";
 import BaseForm from "components/forms/Base";
 import FormGroup from "components/forms/shared/FormGroup";
 import ErrorText from "components/forms/shared/ErrorText";
@@ -49,7 +50,7 @@ function LoginForm({ closeModal }) {
   return (
     <BaseForm onSubmit={handleSubmit(onSubmit)}>
       <SocialAuthenticationContainer closeModal={closeModal} />
-      <hr />
+      <LineText className="mb-3">OR</LineText>
       <FormGroup label="Email/Username" errors={errors.username}>
         <Controller
           as={Form.Control}

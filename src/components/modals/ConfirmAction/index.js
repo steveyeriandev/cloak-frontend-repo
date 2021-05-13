@@ -22,6 +22,7 @@ function ConfirmActionModal({
   isLoading,
   confirmText,
   confirmIcon,
+  declineText,
   actionContainerProps,
   confirmButtonProps,
   errorMessage,
@@ -35,7 +36,7 @@ function ConfirmActionModal({
       <ErrorText text={errorMessage} />
       <ActionContainer {...actionContainerProps}>
         <Button variant="link" onClick={props.onHide}>
-          Cancel
+          {declineText}
         </Button>
         <LoadingButton
           variant="primary"
@@ -70,6 +71,9 @@ ConfirmActionModal.propTypes = {
   // Text to display on the confirm button.
   confirmText: PropTypes.string,
 
+  // Text to display for declining the action.
+  declineText: PropTypes.string,
+
   // An error message to show in case something goes wrong.
   errorMessage: PropTypes.string,
 
@@ -79,6 +83,7 @@ ConfirmActionModal.propTypes = {
 
 ConfirmActionModal.defaultProps = {
   confirmText: "Yes, delete",
+  declineText: "Cancel",
   errorMessage: null,
 };
 

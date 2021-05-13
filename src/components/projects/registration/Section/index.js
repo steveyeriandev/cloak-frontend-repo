@@ -6,6 +6,7 @@ import Alert from "react-bootstrap/Alert";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
 import { useModal } from "react-modal-hook";
 
 import EmptyActionSection from "components/general/EmptyActionSection";
@@ -13,6 +14,9 @@ import RegistrationTierModal from "components/modals/RegistrationTier";
 import StripeConnectButton from "components/buttons/StripeConnect";
 import SectionHeader from "components/general/SectionHeader";
 import RegistrationTierPaymentSection from "components/tiers/PaymentSection";
+import FormModal from "components/modals/Form";
+import EmailForm from "components/forms/Email";
+import { supportEmailUrl } from "features/emails/api";
 
 function RegistrationSection({
   project,
@@ -34,6 +38,21 @@ function RegistrationSection({
   const [showCreateTierModal, hideCreateTierModal] = useModal(() => {
     return <RegistrationTierModal onHide={hideCreateTierModal} />;
   });
+  const [showSupportModal, hideSupportModal] = useModal(() => {
+    return (
+      <FormModal title="Contact us" onHide={hideSupportModal}>
+        <EmailForm
+          closeModal={hideSupportModal}
+          email={{
+            to: "support@radhowtoschool.com",
+            subject: "Pay button approval",
+          }}
+          apiUrl={supportEmailUrl}
+          toDisabled
+        />
+      </FormModal>
+    );
+  });
 
   function renderOwnerNotification() {
     /* Renders a notification alert for the owner to know what needs to be done to activate payment
@@ -48,7 +67,22 @@ function RegistrationSection({
        4) Profit.
     */
 
-    if (user.account === null)
+    if (!user.isApproved)
+      return (
+        <Alert variant="white">
+          You must be a verified user to create payment buttons.
+          <Button
+            variant="primary"
+            block
+            className="mt-3"
+            onClick={showSupportModal}
+          >
+            <FontAwesomeIcon icon={faEnvelope} /> Contact Support
+          </Button>
+        </Alert>
+      );
+
+    if (user.account === null) {
       return (
         <Alert variant="info">
           You must connect your account to create payment buttons.
@@ -62,7 +96,7 @@ function RegistrationSection({
           </StripeConnectButton>
         </Alert>
       );
-    else if (classRegistrationIds.length === 0)
+    } else if (classRegistrationIds.length === 0)
       return (
         <EmptyActionSection
           tooltip="Add pay buttons to sell access to different buckets. Buckets are containers for user generated content from you and/or your audience. Once you create a bucket, it appears in the dropdown menu on the upper left of your project page. You can use them in a variety of different ways. See this link for examples."
@@ -70,7 +104,6 @@ function RegistrationSection({
           buttonAction={showCreateTierModal}
         />
       );
-    else return null;
   }
 
   // Before doing anything, let's check that the project is available to receive registrations.

@@ -2,6 +2,7 @@ import React from "react";
 import { Router, Redirect, Location } from "@reach/router";
 
 import DashboardRoute from "routes/Dashboard";
+import SiteFeedRoute from "routes/SiteFeed";
 import ProjectListRoute from "routes/Projects/ListAll";
 import ProjectCreateRoute from "routes/Projects/Create";
 import ProjectSearchRoute from "routes/Projects/Search";
@@ -49,10 +50,11 @@ export default function BaseRouter() {
   return (
     <>
       <Router>
-        <Redirect noThrow from="/" to="projects" />
+        <Redirect noThrow from="/" to="feed" />
         <TermsOfUseRoute path="terms-of-use" />
         <PrivacyPolicyRoute path="privacy-policy" />
         <DashboardRoute path="/">
+          <SiteFeedRoute path="feed" />
           <ProjectListRoute path="projects" />
           <ProjectCreateRoute path="projects/create" />
           <ProjectSearchRoute path="projects/search" />

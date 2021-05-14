@@ -1,25 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { navigate } from "@reach/router";
-import { useModal } from "react-modal-hook";
-import { useDispatch } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faLock,
-  faSync,
-  faUserCircle,
-} from "@fortawesome/free-solid-svg-icons";
-
-import FormModal from "components/modals/Form";
-import AuthenticationModal from "components/modals/Authentication";
-import ChangePasswordForm from "components/forms/Auth/ChangePassword";
-import { logoutUser } from "features/accounts/slice";
-import { clearProjects } from "features/projects/slice";
-import { clearBuckets } from "features/buckets/slice";
-import useProfileImage from "hooks/ProfileImage";
 import NotificationIcon from "images/icons/notification.png";
+import { listNotifications, partialUpdateNotifications  } from "features/notifications/thunks";
+import { useDispatch, useSelector } from "react-redux";
+import { useToasts } from 'react-toast-notifications';
+import { getProjectUrl } from "../../../utils/projects";
+import { useNavigate } from "@reach/router";
 
 const StyledNavDropdown = styled(NavDropdown)`
     .dropdown-toggle::before{
@@ -40,6 +28,22 @@ const StyledNavDropdown = styled(NavDropdown)`
   a::after {
       content: none;
   }
+
+  .dropdown-menu {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+`;
+
+const StyledLink = styled.a`
+  margin: 0 10px;
+  color: ${(props) => props.theme.dark};
+`;
+
+const StyledDropDownItem = styled(NavDropdown.Item)`
+  background-color: ${(props) => props.seen ? "inherit" : "#d4f5ff"};
+  margin-bottom: 2px;
+  margin-top: 2px;
 `;
 
 const StyledNotIcon = styled.img`
@@ -52,30 +56,97 @@ const StyledNotIcon = styled.img`
 
 `;
 
-function NotificationsDropdown({ account, setExpanded }) {
+function NotificationsDropdown({ account }) {
   // Provides the a dropdown for the list of notifcations related to the logged in user.
- // <StyledNotIcon src={NotificationIcon} alt="Rad how to school notification" />
+
+  const  notifcationsState    = useSelector((state) => state.notifications);
+  const projectState = useSelector((state) => state.projects);
+  const { isLoading, entities} = notifcationsState;
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const triggerFetchNotifications = async () => {
+    try {
+      const action = await dispatch(listNotifications({"params": {}}));
+      if (action.type === "LIST_NOTIFICATIONS/rejected") {
+        addToast("Error occured while fetching notifications", {appearance: 'error', autoDismiss: true})
+      }
+    } catch(err) {
+      addToast("Error occured while fetching notifications", {appearance: 'error', autoDismiss: true})
+    }
+  }
+
+  const renderNotificationContent = (notification) =>{
+    const actor = notification.action.actor ? notification.action.actor.firstName : "";
+    
+    if (notification.action.verb === "made a comment") {
+      return `${actor} ${notification.action.verb} on ${notification.action.target.title}`;
+    } else if (notification.action.verb === "mentioned") {
+      return `${actor} has ${notification.action.verb} you`;
+    } else {
+      return ""
+    }
+  }
+
+  const markNotificationAsSeen = async (notification) => {
+    try {
+      const action = await dispatch(partialUpdateNotifications({
+        objectId: notification.id,
+        data: {seen: true}
+      }));
+      if (action.type == "PATCH_NOTIFICATIONS/rejected"){
+        addToast("Error occured while marking notification seen", {appearance: 'error', autoDismiss: true})
+      }
+    } catch (e) {
+      addToast("Error occured while marking notification seen", {appearance: 'error', autoDismiss: true})
+    }
+  }
+
+  const redirectToNotificationUrl = (notification) => {
+    if (notification.action.verb === "made a comment") {
+      let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
+      project = project ? project : projectState.entities.recordings.find((item) => notification.action.target.id === item.id);
+      if (project) {
+        const url = getProjectUrl(project);
+        navigate(url);
+      }
+      
+    return ""
+   }
+  }
+
+  useEffect(() => {
+    triggerFetchNotifications();
+    setInterval(triggerFetchNotifications, 120000);
+  }, []);
+
   const isAuthenticated = account.token !== "";
-  const notsTest = ["Notification 01", "Notification 02", "Notification 03"]
-  const [nots, setNots] = useState([...notsTest])
+  const notificationsCount = entities ? entities.results ? entities.results.filter(entity => !entity.seen).length : 0 : 0;
+
   if (isAuthenticated) {
     return (
-        <StyledNavDropdown totalnots={4}
+        <StyledNavDropdown totalnots={notificationsCount}
           title={<StyledNotIcon src={NotificationIcon} alt="Rad how to school notification" />}
           id="notifications-navbar-dropdown"
           alignRight
         >
-            {nots.map(notification =>
-                <NavDropdown.Item
-                key={notification}
+          {isLoading ? "Loading" : notificationsCount ? 
+            entities.results.map(notification =>
+                <StyledDropDownItem
+                seen={notification.seen ? "seen" : null}
+                key={notification.id}
                 onClick={() => {
-                  setExpanded(false);
+                  markNotificationAsSeen(notification);
+                  redirectToNotificationUrl(notification);
                 }}
               >
-                {notification}
-              </NavDropdown.Item>    
-            )}
+                {renderNotificationContent(notification)}
+              </StyledDropDownItem>    
+            )
+            : 
+            ""
+          }
         </StyledNavDropdown>
       );
   }
@@ -88,9 +159,6 @@ function NotificationsDropdown({ account, setExpanded }) {
 NotificationsDropdown.propTypes = {
   // The account state of the user.
   account: PropTypes.object.isRequired,
-
-  // Action to fire to let the navbar know that the dropdown is expanded.
-  setExpanded: PropTypes.func.isRequired,
 };
 
 export default NotificationsDropdown;

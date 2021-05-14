@@ -6,6 +6,7 @@ import bucketSlice from "features/buckets/slice";
 import imageUploadSessionSlice from "features/imageUploadSession/slice";
 import revenueSplitSlice from "features/revenueSplits/slice";
 import contentTypeSlice from "features/contentTypes/slice";
+import notificationsSlice from "features/notifications/slice";
 
 export default combineReducers({
   account: accountSlice,
@@ -15,4 +16,5 @@ export default combineReducers({
   imageUploadSession: imageUploadSessionSlice,
   revenueSplits: revenueSplitSlice,
   contentTypes: contentTypeSlice,
+  notifications: notificationsSlice
 });

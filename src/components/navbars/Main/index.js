@@ -141,10 +141,13 @@ function MainNavbar({ shadow }) {
               <Nav.Link as={Link} to="/">
                 <StyledHomeIcon src={HomeIcon} alt="Rad how to school home" />
               </Nav.Link>
+              {
+              accountState.token !== "" ?
               <NotificationsDropDown
                 account={accountState}
                 setExpanded={setExpanded}
-              />
+              /> : ""
+              }
               {user.isApproved && (
                 <MainNavLink
                   as={Link}

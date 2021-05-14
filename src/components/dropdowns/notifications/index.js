@@ -189,11 +189,13 @@ function NotificationsDropdown({ account }) {
 
   const redirectToNotificationUrl = (notification) => {
     if (notification.action.verb === "made a comment") {
-      let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
-      project = project ? project : projectState.entities.recordings.find((item) => notification.action.target.id === item.id);
-      if (project) {
-        const url = getProjectUrl(project);
-        navigate(url);
+      if (projectState.entities.classes) {
+        let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
+        project = project ? project : projectState.entities.recordings.find((item) => notification.action.target.id === item.id);
+        if (project) {
+          const url = getProjectUrl(project);
+          navigate(url);
+        }
       }
       
     return ""

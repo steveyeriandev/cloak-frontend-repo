@@ -131,7 +131,7 @@ function NotificationsDropdown({ account }) {
           id="notifications-navbar-dropdown"
           alignRight
         >
-          {isLoading ? "Loading" : notificationsCount ? 
+          {isLoading ? "Loading" : entities.results && entities.results.length ? 
             entities.results.map(notification =>
                 <StyledDropDownItem
                 seen={notification.seen ? "seen" : null}

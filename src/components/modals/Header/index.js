@@ -13,6 +13,8 @@ const StyledModalHeader = styled(Modal.Header)`
 `;
 
 function ModalHeader({ title, ...props }) {
+  if (!title) return null;
+
   return (
     <StyledModalHeader {...props}>
       <Modal.Title>{title}</Modal.Title>

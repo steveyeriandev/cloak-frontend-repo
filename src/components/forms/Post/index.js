@@ -3,18 +3,21 @@ import PropTypes from "prop-types";
 import { useForm, Controller } from "react-hook-form";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShare } from "@fortawesome/free-solid-svg-icons";
+import { faShare, faSave } from "@fortawesome/free-solid-svg-icons";
 import { useToasts } from "react-toast-notifications";
+import { useDispatch } from "react-redux";
 
 import LoadingButton from "components/buttons/Loading";
+import ModalBackButton from "components/modals/BackButton";
 import PostService from "features/posts/service";
+import { updatePost } from "features/posts/thunks";
 import FormGroup from "../shared/FormGroup";
 import ButtonContainer from "../shared/ButtonContainer";
 import FormErrorText from "../shared/ErrorText";
 import SubmitDivider from "../shared/SubmitDivider";
 import BaseForm from "../Base";
 
-function PostForm({ post, closeModal, ...props }) {
+function PostForm({ post, closeModal, backAction, ...props }) {
   const {
     handleSubmit,
     control,
@@ -25,6 +28,9 @@ function PostForm({ post, closeModal, ...props }) {
   });
   const [formError, setFormError] = useState(null);
   const { addToast } = useToasts();
+  const dispatch = useDispatch();
+
+  const isUpdating = post && post.id;
 
   async function onSubmit(data) {
     setFormError(null);
@@ -34,16 +40,37 @@ function PostForm({ post, closeModal, ...props }) {
     };
 
     const postService = new PostService();
+    const apiCall = isUpdating
+      ? dispatch(updatePost({ postId: post.id, payload }))
+      : postService.create(payload);
+    const verb = isUpdating ? "updating" : "creating";
+    const successMessage = isUpdating
+      ? "Your post has been updated!"
+      : "Your upload has been shared!";
+
     try {
-      await postService.create(payload);
+      await apiCall;
       closeModal();
-      addToast("Your upload has been shared!", { appearance: "success" });
+      addToast(successMessage, { appearance: "success" });
     } catch (err) {
       setFormError(
         (err.response && err.response.data && err.response.data.detail) ||
-          "Error creating post"
+          `Error ${verb} post`
       );
     }
+  }
+
+  function renderButtonText() {
+    // Different text based on if we're creating or saving.
+    return isUpdating ? (
+      <span>
+        <FontAwesomeIcon icon={faSave} /> Save
+      </span>
+    ) : (
+      <span>
+        <FontAwesomeIcon icon={faShare} /> Share
+      </span>
+    );
   }
 
   return (
@@ -63,14 +90,15 @@ function PostForm({ post, closeModal, ...props }) {
       <SubmitDivider />
       <FormErrorText text={formError} />
 
-      <ButtonContainer>
+      <ButtonContainer className="justify-content-between">
+        {backAction && <ModalBackButton onClick={backAction} />}
         <LoadingButton
           variant="primary"
           type="submit"
           isLoading={isSubmitting}
           width={150}
         >
-          <FontAwesomeIcon icon={faShare} /> Share
+          {renderButtonText()}
         </LoadingButton>
       </ButtonContainer>
     </BaseForm>

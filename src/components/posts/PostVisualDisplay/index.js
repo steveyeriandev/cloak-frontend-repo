@@ -2,12 +2,16 @@ import React from "react";
 import PropTypes from "prop-types";
 import Image from "react-bootstrap/Image";
 import styled from "styled-components";
+import { useModal } from "react-modal-hook";
+import { useDispatch } from "react-redux";
 
-import PostImageStack from "components/carousels/PostImageStack";
-import Webcomic from "components/buckets/Uploads/Webcomic";
+import BucketUploadModal from "components/modals/BucketUpload";
+import WebComicModal from "components/modals/WebComic";
+import ImageStackCarousel from "components/carousels/ImageStack";
 import { bucketUploadType } from "utils/enums";
 import PdfIcon from "images/icons/pdf.png";
 import GenericProjectImage from "images/project-generic.jpg";
+import { fetchBucketUpload } from "features/bucketUploads/thunks";
 
 const FileContainer = styled.div`
   display: flex;
@@ -23,13 +27,44 @@ const StyledVideo = styled.video`
   width: 100%;
 `;
 
+const ClickablePostImage = styled(Image)`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 function PostVisualDisplay({ contentType, contentObject, showGenericProject }) {
   // Provides the visual portion of a shared post in public feed or in the post modal.
+
+  const dispatch = useDispatch();
 
   function openPdf(pdfUrl) {
     // Opens the pdf file in new tab.
     const newWindow = window.open(pdfUrl, "_blank", "noopener,noreferrer");
     if (newWindow) newWindow.opener = null;
+  }
+
+  const [showWebComicModal, hideWebComicModal] = useModal(() => {
+    return (
+      <WebComicModal onHide={hideWebComicModal} bucketUpload={contentObject} />
+    );
+  });
+
+  const [showBucketUploadModal, hideBucketUploadModal] = useModal(() => {
+    return (
+      <BucketUploadModal
+        bucketUpload={contentObject}
+        onHide={hideBucketUploadModal}
+      >
+        <ImageStackCarousel bucketUpload={contentObject} />
+      </BucketUploadModal>
+    );
+  });
+
+  function launchImageStackCarousel() {
+    // Opens the carousel to view the sorted images in the bucket upload.
+    dispatch(fetchBucketUpload(contentObject.id));
+    showBucketUploadModal(contentObject);
   }
 
   if (contentType.model === "project") {
@@ -44,13 +79,32 @@ function PostVisualDisplay({ contentType, contentObject, showGenericProject }) {
       />
     );
   } else if (contentType.model === "bucketupload") {
-    // For each type of bueckt upload, we have a different type of render.
+    // For each type of bucket upload, we have a different type of render.
     if (contentObject.kind === bucketUploadType.imageStack) {
-      // Note: Need to not focus the carousel or else when typing the carousel renders and takes
-      // the focus.
-      return <PostImageStack bucketUpload={contentObject} autofocus={false} />;
+      const imageSrc = contentObject.coverImage
+        ? contentObject.coverImage.image
+        : contentObject.images[0].image;
+
+      return (
+        <ClickablePostImage
+          fluid
+          src={imageSrc}
+          alt=""
+          onClick={launchImageStackCarousel}
+        />
+      );
     } else if (contentObject.kind === bucketUploadType.comic) {
-      return <Webcomic bucketUpload={contentObject} />;
+      const imageSrc = contentObject.coverImage
+        ? contentObject.coverImage.image
+        : contentObject.images[0].image;
+      return (
+        <ClickablePostImage
+          fluid
+          src={imageSrc}
+          alt=""
+          onClick={showWebComicModal}
+        />
+      );
     } else if (contentObject.kind === bucketUploadType.pdf)
       return (
         <FileContainer>

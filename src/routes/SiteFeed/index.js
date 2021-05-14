@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Alert from "react-bootstrap/Alert";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import InfiniteScroll from "react-infinite-scroll-component";
 import styled from "styled-components";
-
-import LoadingContainer from "components/loading/Container";
-import PostService from "features/posts/service.js";
-import Post from "components/posts/Post";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+
+import LoadingContainer from "components/loading/Container";
+import Post from "components/posts/Post";
+import { fetchPosts } from "features/posts/thunks";
 
 const StyledRow = styled(Row)`
   > .infinite-scroll-component__outerdiv {
@@ -22,26 +23,19 @@ function SiteFeedRoute() {
   // Provides the main static site feed that users can view new shared posts.
 
   const [isLoading, setIsLoading] = useState(true);
-  const [feedData, setFeedData] = useState([]);
-  const [feedDataNext, setFeedDataNext] = useState();
+  const dispatch = useDispatch();
+  const postState = useSelector((state) => state.posts);
 
-  useEffect(() => loadFeedData(), []);
+  useEffect(() => loadFeedData({ fresh: true }), []);
 
-  const postService = new PostService();
-
-  async function loadFeedData() {
+  async function loadFeedData({ fresh, nextUrl }) {
     // Performs the load of the site feed data.
-    if (feedData.length === 0) setIsLoading(true);
-    const response = feedDataNext
-      ? await postService.getNextUrl(feedDataNext)
-      : await postService.list();
-    setFeedData([...feedData, ...response.data.results]);
-    setFeedDataNext(response.data.next);
-    if (isLoading) setIsLoading(false);
+    await dispatch(fetchPosts({ fresh, nextUrl }));
+    setIsLoading(false);
   }
 
   function renderItems() {
-    return feedData.map((post) => (
+    return postState.entities.map((post) => (
       <Col md={{ span: 8, offset: 2 }} key={post.id}>
         <Post post={post} />
       </Col>
@@ -50,7 +44,7 @@ function SiteFeedRoute() {
 
   if (isLoading) return <LoadingContainer text="Loading site feed" />;
 
-  if (feedData.length === 0)
+  if (postState.entities.length === 0)
     return (
       <Container className="pt-5">
         <Alert className="border bg-white text-center">
@@ -63,9 +57,9 @@ function SiteFeedRoute() {
     <Container>
       <StyledRow>
         <InfiniteScroll
-          dataLength={feedData.length}
-          next={loadFeedData}
-          hasMore={feedDataNext !== null}
+          dataLength={postState.entities.length}
+          next={() => loadFeedData({ fresh: false, nextUrl: postState.next })}
+          hasMore={postState.next !== null}
           loader={<LoadingContainer text="Loading more..." className="mb-5" />}
           scrollableTarget="root"
           style={{ overFlowY: "none" }}

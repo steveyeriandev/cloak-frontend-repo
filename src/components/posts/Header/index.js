@@ -10,6 +10,7 @@ import { useModal } from "react-modal-hook";
 import AuthorContainer from "components/general/AuthorContainer";
 import PostActionsModal from "components/modals/PostActions";
 import { getProjectUrl } from "utils/projects";
+import Moment from "react-moment";
 
 const PostActionIcon = styled(FontAwesomeIcon)`
   margin-left: 10px;
@@ -27,12 +28,21 @@ const Wrapper = styled.div`
   padding: ${(props) => props.theme.spacing} ${(props) => props.theme.spacingLg};
 `;
 
-const SecondaryContainer = styled.div``;
+const PrimaryContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1 0 33%;
+`;
+
+const SecondaryContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 function PostHeader({ post }) {
   // Provides the header component for a post, which can show some metadata about the post and
   // provide actions.
-  const { createdBy } = post;
+  const { createdBy, created } = post;
   const contentTypes = useSelector((state) => state.contentTypes.entities);
   const user = useSelector((state) => state.account.user);
   const [showPostActionsModal, hidePostActionsModal] = useModal(() => {
@@ -53,7 +63,12 @@ function PostHeader({ post }) {
 
   return (
     <Wrapper>
-      <AuthorContainer user={createdBy} />
+      <PrimaryContainer>
+        <AuthorContainer user={createdBy} />
+        <Moment fromNow className="ml-1 text-muted d-none d-md-block">
+          {created}
+        </Moment>
+      </PrimaryContainer>
       <SecondaryContainer className="pr-3">
         <Link to={getProjectUrl(getProject())}>{getProject().title}</Link>
         {isOwner && (

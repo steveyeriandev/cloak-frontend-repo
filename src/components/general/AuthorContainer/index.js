@@ -6,10 +6,6 @@ import { Link } from "@reach/router";
 
 import { getUserImage } from "utils/users";
 
-const Wrapper = styled.div`
-  flex: 1 0 25%;
-`;
-
 const UserImage = styled(Image)`
   width: 50px;
   height: 50px;
@@ -27,10 +23,10 @@ const UserLink = styled(Link)`
 function AuthorContainer({ user }) {
   // Provides a container to be used for displaying an author of an object (i.e. post, upload, etc).
   return (
-    <Wrapper>
+    <div>
       <UserImage src={getUserImage(user)} roundedCircle />
       <UserLink to={`/users/${user.username}`}> {user.username}</UserLink>
-    </Wrapper>
+    </div>
   );
 }
 

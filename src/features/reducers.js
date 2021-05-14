@@ -7,6 +7,7 @@ import imageUploadSessionSlice from "features/imageUploadSession/slice";
 import revenueSplitSlice from "features/revenueSplits/slice";
 import contentTypeSlice from "features/contentTypes/slice";
 import postSlice from "features/posts/slice";
+import notificationsSlice from "features/notifications/slice";
 
 export default combineReducers({
   account: accountSlice,
@@ -17,4 +18,5 @@ export default combineReducers({
   revenueSplits: revenueSplitSlice,
   contentTypes: contentTypeSlice,
   posts: postSlice,
+  notifications: notificationsSlice
 });

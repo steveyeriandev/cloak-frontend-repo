@@ -15,6 +15,7 @@ import {
 
 import ProjectSearchControl from "components/controls/ProjectSearch";
 import AccountDropdown from "components/dropdowns/Account";
+import NotificationsDropDown from "components/dropdowns/notifications";
 import MobileBucketNavigation from "components/navbars/MobileBucketNavigation";
 import MainLinkIcon from "../MainLinkIcon";
 
@@ -36,6 +37,16 @@ const StyledCollapse = styled(Navbar.Collapse)`
     margin-top: ${(props) => props.theme.spacing};
   }
 `;
+
+const StyledHomeIcon = styled.img`
+  @media (max-width: ${(props) => props.theme.smBreakpoint}) {
+    width: auto;
+  }
+  padding: 10px;
+  background-color: ${(props) => props.theme.gray300};
+  border-radius: ${(props) => props.theme.borderRadius};
+`;
+
 
 const StyledBrand = styled(Navbar.Brand)`
   &:hover {
@@ -105,6 +116,12 @@ function MainNavbar({ shadow }) {
               to="/projects"
               onClick={() => setExpanded(false)}
             />
+            {isAuthenticated && (
+              <NotificationsDropDown
+              account={accountState}
+              setExpanded={setExpanded}
+            />
+            )}
             {user.enrollments &&
               (user.enrollments.length > 0 || user.projects.length > 0) && (
                 <Button

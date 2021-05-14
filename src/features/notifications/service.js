@@ -1,6 +1,7 @@
 import ApiService from "features/service";
 
 import { notificationsUrl } from "./api";
+import { axiosInstance } from "features/api";
 
 class NotificationService extends ApiService {
   listUrl = notificationsUrl;

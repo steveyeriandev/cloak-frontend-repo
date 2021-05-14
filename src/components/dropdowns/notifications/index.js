@@ -19,7 +19,7 @@ const StyledNavDropdown = styled(NavDropdown)`
     text-align: center;
     -webkit-border-radius: 7.5px;
     border-radius: 7.5px;
-    background-color: red;
+    background-color: #1877F2;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -30,8 +30,28 @@ const StyledNavDropdown = styled(NavDropdown)`
   }
 
   .dropdown-menu {
-    max-height: 150px;
+    max-height: 250px;
     overflow-y: auto;
+    padding: 20px 10px;
+    width: 400px;
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+     }
+     &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+      border-radius: 10px;
+      background-color: white;
+     }  
+     &::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 3px;
+   
+      &:hover {
+       background: #ccc;
+      }
+     }
+
   }
 `;
 
@@ -41,9 +61,41 @@ const StyledLink = styled.a`
 `;
 
 const StyledDropDownItem = styled(NavDropdown.Item)`
-  background-color: ${(props) => props.seen ? "inherit" : "#d4f5ff"};
+  display: flex;
+  background-color: white;
   margin-bottom: 2px;
   margin-top: 2px;
+  padding: 15px 30px 15px 15px;
+  border-radius: 5px;
+  position: relative;
+  white-space: normal;
+  font-size: 14px;
+  align-items: center;
+  &::before {
+    ${props => !props.seen ? "content: '';" : ''};
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
+    text-align: center;
+    -webkit-border-radius: 7.5px;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    background-color: #1877F2;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    color: white;
+  }
+  &:hover,
+  &:active,
+  &:focus {
+    background-color: #f7f7f7 !important;
+    color: black !important;
+  }
+  &.active {
+    color: black;
+  }
 `;
 
 const StyledNotIcon = styled.img`
@@ -54,6 +106,29 @@ const StyledNotIcon = styled.img`
   background-color: ${(props) => props.theme.gray300};
   border-radius: ${(props) => props.theme.borderRadius};
 
+`;
+
+const NotificationHeader = styled.h3`
+  font-size : 22px
+  font-weight : 700;
+  margin-bottom : 20px;
+  margin-left: 15px;
+`;
+
+const NotTimeStamp = styled.div`
+  font-size: 10px;
+  font-weight: 700;
+`;
+
+const ImageWrapper = styled.div`
+  width : 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+  img {
+    width: 100%;
+    border-radius: 50%;
+    box-shadow: 2px 2px 1px #ccc;
+  }
 `;
 
 function NotificationsDropdown({ account }) {
@@ -103,6 +178,15 @@ function NotificationsDropdown({ account }) {
     }
   }
 
+  const getUserIcon = (notification) => {
+    const actor = notification.action.actor;
+    if (actor) {
+      return actor.image;
+    }
+
+    return "";
+  }
+
   const redirectToNotificationUrl = (notification) => {
     if (notification.action.verb === "made a comment") {
       let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
@@ -131,22 +215,47 @@ function NotificationsDropdown({ account }) {
           id="notifications-navbar-dropdown"
           alignRight
         >
-          {isLoading ? "Loading" : entities.results && entities.results.length ? 
-            entities.results.map(notification =>
-                <StyledDropDownItem
-                seen={notification.seen ? "seen" : null}
-                key={notification.id}
-                onClick={() => {
-                  markNotificationAsSeen(notification);
-                  redirectToNotificationUrl(notification);
-                }}
-              >
-                {renderNotificationContent(notification)}
-              </StyledDropDownItem>    
-            )
-            : 
-            ""
-          }
+          <>
+            <NotificationHeader> Notifications </NotificationHeader>
+            {isLoading ? "Loading" : entities.results && entities.results.length ? 
+              entities.results.map(notification => {
+                const notDate = new Date(notification.action.timestamp);
+                let month = notDate.getMonth() + 1;
+                let day = notDate.getDate();
+                let hour = notDate.getHours();
+                let min = notDate.getMinutes();
+                let year = notDate.getFullYear();
+            
+                month = (month < 10 ? "0" : "") + month;
+                day = (day < 10 ? "0" : "") + day;
+                hour = (hour < 10 ? "0" : "") + hour;
+                min = (min < 10 ? "0" : "") + min;
+                const notDateFormated = `${day}/${month}/${year} ${hour}:${min} `
+                
+                return (
+                  <StyledDropDownItem
+                  seen={notification.seen ? "seen" : null}
+                  key={notification.id}
+                  onClick={() => {
+                    markNotificationAsSeen(notification);
+                    redirectToNotificationUrl(notification);
+                  }}
+                >
+                  <ImageWrapper>
+                   <img src={getUserIcon(notification)} />
+                  </ImageWrapper>
+                  <div>
+                    <div> {renderNotificationContent(notification)} </div>
+                    <NotTimeStamp> {notDateFormated} </NotTimeStamp>
+                  </div>
+                </StyledDropDownItem>  
+                )
+               }
+              )
+              : 
+              ""
+            }
+          </>
         </StyledNavDropdown>
       );
   }

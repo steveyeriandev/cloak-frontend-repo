@@ -3,13 +3,8 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 
 import UsersService from "features/users/service";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import NotificationIcon from "images/icons/notification.png";
-import { listNotifications, partialUpdateNotifications  } from "features/notifications/thunks";
-import { useDispatch, useSelector } from "react-redux";
 import { useToasts } from 'react-toast-notifications';
-import { getProjectUrl } from "../../../utils/projects";
-import { useNavigate } from "@reach/router";
+
 
 const StyledDropDownItem = styled.div`
   display: flex;
@@ -45,7 +40,7 @@ const ImageWrapper = styled.div`
   }
 `;
 
-function MentionsDropDown({ isShown, username }) {
+function MentionsDropDown({ isShown, username, setNewComment, newComment, setMentionWord, setMentions, mentions }) {
   // Provides the a dropdown for the list of mentions when user want to mention another user in a comment
   const [isLoading, setIsLoading] =  useState(false);
   const [usersList, setUserList] = useState([]);
@@ -57,18 +52,29 @@ function MentionsDropDown({ isShown, username }) {
     fetchUserList();
   }, []);
 
-  useEffect(() => setSearchList([...usersList.filter(user => user.username.includes(username))]), [username, usersList])
+  useEffect(() => {
+      const filteredArray = usersList.filter(user => { 
+          return user.username.includes(username);
+      });
+      setSearchList(filteredArray);
+  }, [username, usersList])
+  
 
   async function fetchUserList(){
     try{
         const response = await service.list();
-        console.log(response);
         setUserList(response.data);
         setIsLoading(false);
     } catch (err) {
         setIsLoading(false);
         addToast("Error occured while searching for a user", {appearance: 'error', autoDismiss: true});
     }
+  }
+
+  function handleUsernameClick(user){
+    setNewComment(newComment.replace(/@[^\s]*[^\s]$/g, `@${user.username} `));
+    setMentions([...mentions, user]);
+    setMentionWord("");
   }
 
   if (isShown) {
@@ -79,9 +85,7 @@ function MentionsDropDown({ isShown, username }) {
                 return (
                   <StyledDropDownItem
                   key={user.id}
-                  onClick={() => {
-                    // redirectToNotificationUrl(notification);
-                  }}
+                  onClick={() => handleUsernameClick(user)}
                 >
                   <ImageWrapper>
                    <img src={user.image} />
@@ -105,6 +109,11 @@ function MentionsDropDown({ isShown, username }) {
 MentionsDropDown.propTypes = {
   isShown: PropTypes.bool.isRequired,
   username: PropTypes.string.isRequired,
+  setNewComment: PropTypes.func.isRequired,
+  newComment: PropTypes.string.isRequired,
+  setMentionWord: PropTypes.func.isRequired,
+  setMentions: PropTypes.func.isRequired,
+  mentions: PropTypes.array.isRequired
 };
 
 export default MentionsDropDown;

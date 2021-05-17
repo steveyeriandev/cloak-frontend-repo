@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { useSelector } from "react-redux";
+import reactStringReplace from "react-string-replace";
 
 import CommentService from "features/comments/service";
 import Loading from "components/loading/Loading";
@@ -40,6 +41,8 @@ function NewCommentContainer({
   // Provides a container to make a new comment on a post object.
   const [isLoading, setIsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [mentionWord, setMentionWord] = useState("");
+  const [mentions, setMentions] = useState([]);
   const isAuthenticated = useSelector((state) => state.account.token !== "");
   const showAuthModal = useAuthenticationModal();
 
@@ -47,10 +50,14 @@ function NewCommentContainer({
     // Create a new comment on the post object and add it to the post's comments.
     setIsLoading(true);
     const service = new CommentService();
+    let text = newComment;
+    mentions.forEach((mention) => {
+      text = text.replace(`@${mention.username}`, `<@${mention.id}>`);
+    })
     const payload = {
       objectId,
       contentType: contentTypeId,
-      text: newComment,
+      text
     };
     const response = await service.create(payload);
     if (addNewComment) addNewComment(response.data);
@@ -60,6 +67,13 @@ function NewCommentContainer({
 
   function handleChange(e) {
     setNewComment(e.target.value);
+    const matches = [...e.target.value.matchAll(/@[^\s]*[^\s]$/g)];
+    if (matches.length) {
+      const word = matches[matches.length-1][0].slice(1);
+      setMentionWord(word);
+    } else {
+      setMentionWord("");
+    }
   }
 
   function handleKeyDown(e) {
@@ -76,7 +90,8 @@ function NewCommentContainer({
         value={newComment}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-      />
+      >
+      </CommentControl>
       <Button
         variant="link"
         onClick={isAuthenticated ? createComment : showAuthModal}
@@ -85,13 +100,20 @@ function NewCommentContainer({
         {isLoading ? <Loading size="sm" /> : "Submit"}
       </Button>
     </Wrapper>
-    {newComment ? 
+    {mentionWord ? 
       <MentionsWrapper>
-        <MentionsDropDown isShown={true} username={newComment} />
+        <MentionsDropDown 
+        isShown={true} 
+        username={mentionWord} 
+        setMentionWord={setMentionWord}
+        setNewComment={setNewComment}
+        newComment={newComment}
+        setMentions={setMentions}
+        mentions={mentions}
+        />
       </MentionsWrapper> : ""
     }
     </>
-
   );
 }
 

@@ -9,6 +9,8 @@ import CommentService from "features/comments/service";
 import Loading from "components/loading/Loading";
 import useAuthenticationModal from "hooks/AuthModal";
 
+import MentionsDropDown from  "components/dropdowns/mentions";
+
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -22,6 +24,12 @@ const CommentControl = styled(Form.Control)`
   border: none;
   width: 100%;
 `;
+
+const MentionsWrapper = styled.div`
+    box-shadow: 4px 4px 4px #ccc;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+`
 
 function NewCommentContainer({
   addNewComment,
@@ -60,6 +68,7 @@ function NewCommentContainer({
   }
 
   return (
+    <>
     <Wrapper {...props}>
       <CommentControl
         placeholder="Write new comment..."
@@ -76,6 +85,13 @@ function NewCommentContainer({
         {isLoading ? <Loading size="sm" /> : "Submit"}
       </Button>
     </Wrapper>
+    {newComment ? 
+      <MentionsWrapper>
+        <MentionsDropDown isShown={true} username={newComment} />
+      </MentionsWrapper> : ""
+    }
+    </>
+
   );
 }
 

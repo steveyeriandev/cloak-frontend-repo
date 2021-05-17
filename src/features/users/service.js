@@ -26,4 +26,9 @@ export default class UserService {
   update(payload) {
     return axiosInstance.patch(meUrl, payload);
   }
+
+  list(){
+    return axiosInstance.get(`${this.url}search-user-list/all/`);
+  }
+  
 }

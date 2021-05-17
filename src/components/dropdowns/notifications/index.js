@@ -145,10 +145,10 @@ function NotificationsDropdown({ account }) {
     try {
       const action = await dispatch(listNotifications({"params": {}}));
       if (action.type === "LIST_NOTIFICATIONS/rejected") {
-        addToast("Error occured while fetching notifications", {appearance: 'error', autoDismiss: true})
+        addToast("Error occured while fetching notifications", {appearance: 'error', autoDismiss: true});
       }
     } catch(err) {
-      addToast("Error occured while fetching notifications", {appearance: 'error', autoDismiss: true})
+      addToast("Error occured while fetching notifications", {appearance: 'error', autoDismiss: true});
     }
   }
 

@@ -8,10 +8,13 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { useLocation } from "@reach/router";
+import { useToasts } from "react-toast-notifications";
 
 import LoadingContainer from "components/loading/Container";
 import Post from "components/posts/Post";
-import { fetchPosts } from "features/posts/thunks";
+import { fetchPosts, fetchPostDetailsWithContentType } from "features/posts/thunks";
+import { clearSelectedEntity } from "features/posts/slice";
 
 const StyledRow = styled(Row)`
   > .infinite-scroll-component__outerdiv {
@@ -21,12 +24,31 @@ const StyledRow = styled(Row)`
 
 function SiteFeedRoute() {
   // Provides the main static site feed that users can view new shared posts.
-
+  const { addToast } = useToasts();
+  const location = useLocation()
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const postState = useSelector((state) => state.posts);
+  const search = new URLSearchParams(location.search);
+  const object_id = search.get("object_id");
+  const content_type = search.get("content_type");
+  const detailedPost = postState.selectedEntity;
+  // const [showPostModal, hidePostModal] = useModal(() => {
+  //   return <PostModal post={detailedPost} onHide={hidePostModal} />;
+  // });
 
   useEffect(() => loadFeedData({ fresh: true }), []);
+  useEffect(() => {
+    dispatch(clearSelectedEntity());
+    if (object_id) {loadPostDetails(object_id, content_type);};
+  }, [object_id]);
+
+  async function loadPostDetails(object_id, content_type) {
+    const action = await dispatch(fetchPostDetailsWithContentType({objectId: object_id, contentType: content_type}));
+    if ( action.type === "FETCH_POST_DETAILS/rejected" ) {
+      addToast("Error while fetching post with post id : " + object_id , { appearance: "error" });
+    }
+  }
 
   async function loadFeedData({ fresh, nextUrl }) {
     // Performs the load of the site feed data.
@@ -40,6 +62,21 @@ function SiteFeedRoute() {
         <Post post={post} />
       </Col>
     ));
+  }
+
+  // if this page is render after user clicks a notification
+  // we show the notification post on top
+  function renderSelectedPostDetails() {
+    if (detailedPost && object_id) {
+      return (
+      <Col md={{ span: 8, offset: 2 }} key={detailedPost.id}>
+        <Post post={detailedPost} isDisplayedFully={true} />
+      </Col>
+      )
+    }
+    else {
+      return null;
+    }
   }
 
   if (isLoading) return <LoadingContainer text="Loading site feed" />;
@@ -56,6 +93,7 @@ function SiteFeedRoute() {
   return (
     <Container>
       <StyledRow>
+        {renderSelectedPostDetails()}
         <InfiniteScroll
           dataLength={postState.entities.length}
           next={() => loadFeedData({ fresh: false, nextUrl: postState.next })}

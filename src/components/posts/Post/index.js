@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -21,7 +21,7 @@ const ContentContainer = styled.div`
   }
 `;
 
-function PostItem({ post }) {
+function PostItem({ post, isDisplayedFully }) {
   // Renders a single post in a feed.
 
   const { createdBy, text, contentObject, contentType } = post;
@@ -30,11 +30,13 @@ function PostItem({ post }) {
   const contentTypes = useSelector((state) => state.contentTypes.entities);
   const contentTypeObj = contentTypes.find((ct) => ct.id === contentType);
   const isAuthenticated = useSelector((state) => state.account.token !== "");
-  const [showPostModal, hidePostModal] = useModal(() => {
+  const [showPostModal, hidePostModal] = useModal(({ in: open }) => {
     return <PostModal post={post} onHide={hidePostModal} />;
   });
   const showAuthModal = useAuthenticationModal();
-
+  
+  useEffect(() => { if (isDisplayedFully) {showPostModal()} }, []);
+  
   function renderNewComments() {
     // When the user creates new comments, we need to render them here.
     return newComments.map((comment) => {
@@ -84,6 +86,12 @@ function PostItem({ post }) {
 PostItem.propTypes = {
   // The post object that we're rendering.
   post: PropTypes.object.isRequired,
+  // do we display the post on a model when the page first loaded?
+  isDisplayedFully: PropTypes.bool
 };
+
+PostItem.defaultProps = {
+  isDisplayedFully: false
+}
 
 export default PostItem;

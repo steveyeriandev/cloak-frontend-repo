@@ -1,15 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { fetchPosts, updatePost, deletePost } from "./thunks";
+import { fetchPosts, updatePost, deletePost, fetchPostDetails, fetchPostDetailsWithContentType } from "./thunks";
 
 const initialState = {
   next: null,
   entities: [],
+  // holds the selected post details
+  selectedEntity: null,
 };
 
 const postSlice = createSlice({
   name: "slices",
   initialState,
+  reducers: {
+    clearSelectedEntity: (state) => {
+      state.selectedEntity = null;
+    }
+  },
   extraReducers: {
     [fetchPosts.fulfilled]: (state, action) => {
       // Either append the results or start from scratch.
@@ -17,6 +24,12 @@ const postSlice = createSlice({
         ? action.payload.results
         : [...state.entities, ...action.payload.results];
       state.next = action.payload.next;
+    },
+    [fetchPostDetails.fulfilled]: (state, action) => {
+      state.selectedEntity = action.payload;
+    },
+    [fetchPostDetailsWithContentType.fulfilled]: (state, action) => {
+      state.selectedEntity = action.payload;
     },
     [updatePost.fulfilled]: (state, action) => {
       state.entities = state.entities.map((post) => {
@@ -32,6 +45,6 @@ const postSlice = createSlice({
   },
 });
 
-export const { setCurrent, removeCurrent } = postSlice.actions;
+export const { setCurrent, removeCurrent, clearSelectedEntity } = postSlice.actions;
 
 export default postSlice.reducer;

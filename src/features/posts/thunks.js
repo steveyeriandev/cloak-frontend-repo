@@ -1,5 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { UPDATE_POST, FETCH_POSTS, DELETE_POST } from "./constants";
+import { 
+  UPDATE_POST,
+  FETCH_POSTS,
+  DELETE_POST,
+  FETCH_POST_DETAILS,
+  FETCH_POST_DETAILS_WITH_CONTENT_TYPE
+} from "./constants";
 import PostService from "./service";
 
 export const fetchPosts = createAsyncThunk(
@@ -14,6 +20,38 @@ export const fetchPosts = createAsyncThunk(
     return response.data;
   }
 );
+
+export const fetchPostDetails = createAsyncThunk(
+  FETCH_POST_DETAILS,
+  async ({ postId }, { rejectWithValue }) => {
+    // Fetch next tells us if we're fetching the next page, or if we're fetching fresh.
+    const service = new PostService();
+    try {
+      const response = await service.fetch(postId);
+      return response.data;
+    } catch (err) {
+      const { status, data } = err.response;
+      return rejectWithValue({ status, data });
+    }
+  }
+);
+
+
+export const fetchPostDetailsWithContentType = createAsyncThunk(
+  FETCH_POST_DETAILS_WITH_CONTENT_TYPE,
+  async ({ objectId, contentType }, { rejectWithValue }) => {
+    // Fetch next tells us if we're fetching the next page, or if we're fetching fresh.
+    const service = new PostService();
+    try {
+      const response = await service.fetchPostWIthContentType(objectId, contentType);
+      return response.data;
+    } catch (err) {
+      const { status, data } = err.response;
+      return rejectWithValue({ status, data });
+    }
+  }
+);
+
 
 export const updatePost = createAsyncThunk(
   UPDATE_POST,

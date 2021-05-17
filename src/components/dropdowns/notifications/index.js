@@ -156,7 +156,7 @@ function NotificationsDropdown({ account }) {
     const actor = notification.action.actor ? notification.action.actor.firstName : "";
     
     if (notification.action.verb === "made a comment") {
-      return `${actor} ${notification.action.verb} on ${notification.action.target.title}`;
+      return `${actor} ${notification.action.verb} on ${notification.action.target.bucket ? notification.action.target.bucket.title : notification.action.target.title}`;
     } else if (notification.action.verb === "mentioned") {
       return `${actor} has ${notification.action.verb} you`;
     } else {
@@ -188,23 +188,29 @@ function NotificationsDropdown({ account }) {
   }
 
   const redirectToNotificationUrl = (notification) => {
-    if (notification.action.verb === "made a comment") {
-      if (projectState.entities.classes) {
-        let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
-        project = project ? project : projectState.entities.recordings.find((item) => notification.action.target.id === item.id);
-        if (project) {
-          const url = getProjectUrl(project);
-          navigate(url);
-        }
-      }
+    if (notification.action.verb === "made a comment" ) {
+        const url = `/feed?object_id=${notification.action.actionObject.objectId}&content_type=${notification.action.actionObject.contentType}`
+        navigate(url);
+    } else if (notification.action.verb === "mentioned") {
+      const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
+      navigate(url); 
+    }
+    // if (notification.action.verb === "made a comment") {
+    //   if (projectState.entities.classes) {
+    //     let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
+    //     project = project ? project : projectState.entities.recordings.find((item) => notification.action.target.id === item.id);
+    //     if (project) {
+    //       const url = getProjectUrl(project);
+    //       navigate(url);
+    //     }
+    //   }
       
     return ""
-   }
   }
 
   useEffect(() => {
     triggerFetchNotifications();
-    setInterval(triggerFetchNotifications, 120000);
+    setInterval(triggerFetchNotifications, 30000);
   }, []);
 
   const isAuthenticated = account.token !== "";

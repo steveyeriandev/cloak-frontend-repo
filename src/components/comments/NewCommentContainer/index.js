@@ -4,7 +4,6 @@ import styled from "styled-components";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { useSelector } from "react-redux";
-import reactStringReplace from "react-string-replace";
 
 import CommentService from "features/comments/service";
 import Loading from "components/loading/Loading";

@@ -14,6 +14,12 @@ class CommentService extends ApiService {
     const url = `${this._getDetailUrl(commentId)}report/`;
     return axiosInstance.post(url);
   }
+
+  addReply({commentId, data}){
+    // create a reply for a given comment
+    const url = `${this._getDetailUrl(commentId)}add_reply/`;
+    return axiosInstance.post(url, data);
+  }
 }
 
 export default CommentService;

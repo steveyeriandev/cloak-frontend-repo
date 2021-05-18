@@ -159,6 +159,8 @@ function NotificationsDropdown() {
       return `${actor} ${notification.action.verb} on ${notification.action.target.bucket ? notification.action.target.bucket.title : notification.action.target.title}`;
     } else if (notification.action.verb === "mentioned") {
       return `${actor} has ${notification.action.verb} you`;
+    } else if (notification.action.verb === "liked") {
+      return `${actor} has Liked your post ${notification.action.target.text ? notification.action.target.text : ""}.`;
     } else {
       return ""
     }
@@ -194,17 +196,10 @@ function NotificationsDropdown() {
     } else if (notification.action.verb === "mentioned") {
       const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
       navigate(url); 
+    } else if (notification.action.verb === "liked") {
+      const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
+      navigate(url); 
     }
-    // if (notification.action.verb === "made a comment") {
-    //   if (projectState.entities.classes) {
-    //     let project = projectState.entities.classes.find((item) => notification.action.target.id === item.id);
-    //     project = project ? project : projectState.entities.recordings.find((item) => notification.action.target.id === item.id);
-    //     if (project) {
-    //       const url = getProjectUrl(project);
-    //       navigate(url);
-    //     }
-    //   }
-      
     return ""
   }
 

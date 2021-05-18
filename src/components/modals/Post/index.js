@@ -12,6 +12,7 @@ import PostVisualDisplay from "components/posts/PostVisualDisplay";
 import CommentContainer from "components/comments/Container";
 import { getUserImage } from "utils/users";
 import { bucketUploadType } from "utils/enums";
+import PostActions from "components/posts/actions";
 
 const Wrapper = styled.div``;
 
@@ -74,6 +75,7 @@ function PostModal({ post, ...props }) {
             showGenericProject
           />
         </div>
+        <PostActions post={post} />
         <CommentContainer
           contentObject={contentObject}
           contentTypeObj={contentTypeObj}

@@ -116,12 +116,7 @@ function MainNavbar({ shadow }) {
               to="/projects"
               onClick={() => setExpanded(false)}
             />
-            {isAuthenticated && (
-              <NotificationsDropDown
-              account={accountState}
-              setExpanded={setExpanded}
-            />
-            )}
+            {isAuthenticated && <NotificationsDropDown />}
             {user.enrollments &&
               (user.enrollments.length > 0 || user.projects.length > 0) && (
                 <Button

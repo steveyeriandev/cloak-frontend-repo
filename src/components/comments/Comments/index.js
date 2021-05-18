@@ -36,7 +36,6 @@ function CommentContainer({
     // Fetch the comments for the content object.
     setIsLoading(true);
     const response = await service.comments(contentObject.id);
-    console.log(response)
     handleResponseSuccess(response);
   }
 

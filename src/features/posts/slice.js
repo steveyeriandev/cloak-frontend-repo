@@ -1,6 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { fetchPosts, updatePost, deletePost, fetchPostDetails, fetchPostDetailsWithContentType } from "./thunks";
+import { 
+  fetchPosts, 
+  updatePost, 
+  deletePost, 
+  fetchPostDetails, 
+  fetchPostDetailsWithContentType,
+  addLike
+} from "./thunks";
 
 const initialState = {
   next: null,
@@ -34,6 +41,12 @@ const postSlice = createSlice({
     [updatePost.fulfilled]: (state, action) => {
       state.entities = state.entities.map((post) => {
         if (post.id !== action.meta.arg.postId) return post;
+        return action.payload;
+      });
+    },
+    [addLike.fulfilled]: (state, action) => {
+      state.entities = state.entities.map((post) => {
+        if (post.id !== action.payload.id) return post;
         return action.payload;
       });
     },

@@ -19,7 +19,7 @@ const StyledNavDropdown = styled(NavDropdown)`
     text-align: center;
     -webkit-border-radius: 7.5px;
     border-radius: 7.5px;
-    background-color: #1877F2;
+    background-color: ${props => props.theme.blue};
     position: absolute;
     top: 5px;
     right: 5px;
@@ -44,11 +44,11 @@ const StyledNavDropdown = styled(NavDropdown)`
       background-color: white;
      }  
      &::-webkit-scrollbar-thumb {
-      background-color: #ccc;
+      background-color: ${props => props.theme.gray100};
       border-radius: 3px;
    
       &:hover {
-       background: #ccc;
+       background: ${props => props.theme.gray300};
       }
      }
 
@@ -81,7 +81,7 @@ const StyledDropDownItem = styled(NavDropdown.Item)`
     -webkit-border-radius: 7.5px;
     border-radius: 50%;
     transform: translateY(-50%);
-    background-color: #1877F2;
+    background-color: ${props => props.theme.blue};
     position: absolute;
     top: 50%;
     right: 10px;
@@ -90,7 +90,7 @@ const StyledDropDownItem = styled(NavDropdown.Item)`
   &:hover,
   &:active,
   &:focus {
-    background-color: #f7f7f7 !important;
+    background-color: ${props => props.theme.gray200} !important;
     color: black !important;
   }
   &.active {
@@ -127,11 +127,11 @@ const ImageWrapper = styled.div`
   img {
     width: 100%;
     border-radius: 50%;
-    box-shadow: 2px 2px 1px #ccc;
+    box-shadow: 2px 2px 1px ${props => props.theme.gray300};
   }
 `;
 
-function NotificationsDropdown({ account }) {
+function NotificationsDropdown() {
   // Provides the a dropdown for the list of notifcations related to the logged in user.
 
   const  notifcationsState    = useSelector((state) => state.notifications);
@@ -213,69 +213,57 @@ function NotificationsDropdown({ account }) {
     setInterval(triggerFetchNotifications, 30000);
   }, []);
 
-  const isAuthenticated = account.token !== "";
   const notificationsCount = entities ? entities.results ? entities.results.filter(entity => !entity.seen).length : 0 : 0;
 
-  if (isAuthenticated) {
-    return (
-        <StyledNavDropdown totalnots={notificationsCount}
-          title={<StyledNotIcon src={NotificationIcon} alt="Rad how to school notification" />}
-          id="notifications-navbar-dropdown"
-          alignRight
-        >
-          <>
-            <NotificationHeader> Notifications </NotificationHeader>
-            {isLoading ? "Loading" : entities.results && entities.results.length ? 
-              entities.results.map(notification => {
-                const notDate = new Date(notification.action.timestamp);
-                let month = notDate.getMonth() + 1;
-                let day = notDate.getDate();
-                let hour = notDate.getHours();
-                let min = notDate.getMinutes();
-                let year = notDate.getFullYear();
-            
-                month = (month < 10 ? "0" : "") + month;
-                day = (day < 10 ? "0" : "") + day;
-                hour = (hour < 10 ? "0" : "") + hour;
-                min = (min < 10 ? "0" : "") + min;
-                const notDateFormated = `${day}/${month}/${year} ${hour}:${min} `
-                
-                return (
-                  <StyledDropDownItem
-                  seen={notification.seen ? "seen" : null}
-                  key={notification.id}
-                  onClick={() => {
-                    markNotificationAsSeen(notification);
-                    redirectToNotificationUrl(notification);
-                  }}
-                >
-                  <ImageWrapper>
-                   <img src={getUserIcon(notification)} />
-                  </ImageWrapper>
-                  <div>
-                    <div> {renderNotificationContent(notification)} </div>
-                    <NotTimeStamp> {notDateFormated} </NotTimeStamp>
-                  </div>
-                </StyledDropDownItem>  
-                )
-               }
+  return (
+      <StyledNavDropdown totalnots={notificationsCount}
+        title={<StyledNotIcon src={NotificationIcon} alt="Rad how to school notification" />}
+        id="notifications-navbar-dropdown"
+        alignRight
+      >
+        <>
+          <NotificationHeader> Notifications </NotificationHeader>
+          {isLoading ? "Loading" : entities.results && entities.results.length ? 
+            entities.results.map(notification => {
+              const notDate = new Date(notification.action.timestamp);
+              let month = notDate.getMonth() + 1;
+              let day = notDate.getDate();
+              let hour = notDate.getHours();
+              let min = notDate.getMinutes();
+              let year = notDate.getFullYear();
+          
+              month = (month < 10 ? "0" : "") + month;
+              day = (day < 10 ? "0" : "") + day;
+              hour = (hour < 10 ? "0" : "") + hour;
+              min = (min < 10 ? "0" : "") + min;
+              const notDateFormated = `${day}/${month}/${year} ${hour}:${min} `
+              
+              return (
+                <StyledDropDownItem
+                seen={notification.seen ? "seen" : null}
+                key={notification.id}
+                onClick={() => {
+                  markNotificationAsSeen(notification);
+                  redirectToNotificationUrl(notification);
+                }}
+              >
+                <ImageWrapper>
+                  <img src={getUserIcon(notification)} />
+                </ImageWrapper>
+                <div>
+                  <div> {renderNotificationContent(notification)} </div>
+                  <NotTimeStamp> {notDateFormated} </NotTimeStamp>
+                </div>
+              </StyledDropDownItem>  
               )
-              : 
-              ""
-            }
-          </>
-        </StyledNavDropdown>
-      );
-  }
-  else {
-      return null
-  }
-
+              }
+            )
+            : 
+            ""
+          }
+        </>
+      </StyledNavDropdown>
+    );
 }
-
-NotificationsDropdown.propTypes = {
-  // The account state of the user.
-  account: PropTypes.object.isRequired,
-};
 
 export default NotificationsDropdown;

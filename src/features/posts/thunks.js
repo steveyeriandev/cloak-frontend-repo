@@ -4,7 +4,8 @@ import {
   FETCH_POSTS,
   DELETE_POST,
   FETCH_POST_DETAILS,
-  FETCH_POST_DETAILS_WITH_CONTENT_TYPE
+  FETCH_POST_DETAILS_WITH_CONTENT_TYPE,
+  ADD_LIKE
 } from "./constants";
 import PostService from "./service";
 
@@ -73,6 +74,20 @@ export const deletePost = createAsyncThunk(
     const service = new PostService(postId);
     try {
       const response = await service.delete(postId);
+      return response.data;
+    } catch (err) {
+      const { status, data } = err.response;
+      return rejectWithValue({ status, data });
+    }
+  }
+);
+
+export const addLike = createAsyncThunk(
+  ADD_LIKE,
+  async ({ postId }, { rejectWithValue }) => {
+    const service = new PostService(postId);
+    try {
+      const response = await service.addLike(postId);
       return response.data;
     } catch (err) {
       const { status, data } = err.response;

@@ -4,7 +4,12 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import styled from "styled-components";
 import { useModal } from "react-modal-hook";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useToasts } from "react-toast-notifications";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp  } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp as regularFaThumbsUp } from "@fortawesome/free-regular-svg-icons";
 
 import Comment from "components/comments/Comment";
 import NewCommentContainer from "components/comments/NewCommentContainer";
@@ -12,6 +17,8 @@ import PostModal from "components/modals/Post";
 import useAuthenticationModal from "hooks/AuthModal";
 import PostVisualDisplay from "../PostVisualDisplay";
 import PostHeader from "../Header";
+import { addLike } from "features/posts/thunks";
+
 
 const ContentContainer = styled.div`
   padding: ${(props) => props.theme.spacingLg};
@@ -21,11 +28,24 @@ const ContentContainer = styled.div`
   }
 `;
 
+const PostActions = styled.div`
+margin-top: 10px;
+  border-top: 1px solid ${props => props.theme.success};
+  border-bottom: 1px solid ${props => props.theme.success};
+  padding: 10px 10px;
+`;
+
+const StyledFontAwesomeLikeActivated = styled(FontAwesomeIcon)`
+  cursor: pointer;
+`
+
 function PostItem({ post, isDisplayedFully }) {
   // Renders a single post in a feed.
 
-  const { createdBy, text, contentObject, contentType } = post;
+  const { createdBy, text, contentObject, contentType, isLikedByCurrentUser} = post;
   const { displayComment, commentCount } = contentObject;
+  const dispatch = useDispatch();
+  const { addToast } = useToasts();
   const [newComments, setNewComments] = useState([]);
   const contentTypes = useSelector((state) => state.contentTypes.entities);
   const contentTypeObj = contentTypes.find((ct) => ct.id === contentType);
@@ -49,6 +69,15 @@ function PostItem({ post, isDisplayedFully }) {
     setNewComments([...newComments, comment]);
   }
 
+  async function handleLikeClick(){
+    const action  =  await dispatch(addLike({postId: post.id}));
+    if (action.type === "ADD_LIKE/rejected"){
+      addToast("Error while liking a post", {
+        appearance: "error",
+      });
+    }
+  }
+
   return (
     <Card className="my-5">
       <PostHeader post={post} />
@@ -60,6 +89,13 @@ function PostItem({ post, isDisplayedFully }) {
         <p>
           <b>{createdBy.username}</b> {text}
         </p>
+        <PostActions>
+          <StyledFontAwesomeLikeActivated 
+            icon={isLikedByCurrentUser ? faThumbsUp : regularFaThumbsUp} 
+            size="2x" 
+            onClick={handleLikeClick}
+          />
+        </PostActions>
         {commentCount > 1 && (
           <div className="d-block my-2">
             <Button

@@ -21,7 +21,7 @@ const StyledDropDownItem = styled.div`
   &:hover,
   &:active,
   &:focus {
-    background-color: #f7f7f7 !important;
+    background-color: ${props => props.theme.gray200} !important;
     color: black !important;
   }
   &.active {
@@ -36,7 +36,7 @@ const ImageWrapper = styled.div`
   img {
     width: 100%;
     border-radius: 50%;
-    box-shadow: 2px 2px 1px #ccc;
+    box-shadow: 2px 2px 1px ${props => props.theme.gray300};
   }
 `;
 

@@ -15,11 +15,11 @@ const StyledFontAwesomeLikeActivated = styled(FontAwesomeIcon)`
   cursor: pointer;
 `
 const TotalLikes = styled.div`
-  color: ${props => props.theme.red};
+  color: ${props => props.red ? props.theme.red: props.theme.dark};
   font-weight: 700;
   margin-left: 4px;
   margin-top: 4px;
-  font-size: 16px;
+  font-size: 12px;
   cursor: pointer;
 `;
 
@@ -56,11 +56,10 @@ function PostActions({post, ...props}){
       <Wrapper>
         <StyledFontAwesomeLikeActivated 
           icon={isLikedByCurrentUser ? faHeart : regularFaHeart} 
-          color="red"
-          size="2x" 
+          color={isLikedByCurrentUser ? "red" : "#333"}
           onClick={isAuthenticated ? handleLikeClick : showAuthModal}
         />
-        <TotalLikes> ({likesCount}) </TotalLikes>
+        <TotalLikes red={isLikedByCurrentUser ? true : false}> ({likesCount}) </TotalLikes>
       </Wrapper>
   )
 }

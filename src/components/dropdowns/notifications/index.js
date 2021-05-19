@@ -9,6 +9,8 @@ import { useToasts } from 'react-toast-notifications';
 import { formatTimeStamp } from "utils/datetime";
 import { useNavigate } from "@reach/router";
 import { setDisplayCommentFor } from "features/notifications/slice";
+import { getUserImage } from "utils/users";
+
 
 const StyledNavDropdown = styled(NavDropdown)`
     .dropdown-toggle::before{
@@ -182,15 +184,6 @@ function NotificationsDropdown() {
     }
   }
 
-  const getUserIcon = (notification) => {
-    const actor = notification.action.actor;
-    if (actor) {
-      return actor.image;
-    }
-
-    return "";
-  }
-
   const redirectToNotificationUrl = (notification) => {
     if (notification.action.verb === "made a comment" ) {
         const url = `/feed?object_id=${notification.action.actionObject.objectId}&content_type=${notification.action.actionObject.contentType}`
@@ -238,7 +231,7 @@ function NotificationsDropdown() {
                 }}
               >
                 <ImageWrapper>
-                  <img src={getUserIcon(notification)} />
+                  <img src={getUserImage(notification.action.actor)} />
                 </ImageWrapper>
                 <div>
                   <div> {renderNotificationContent(notification)} </div>

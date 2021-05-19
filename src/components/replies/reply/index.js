@@ -2,13 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { formatTimeStamp } from "utils/datetime";
+import { getUserImage } from "utils/users";
 
 const Wrapper = styled.div`
 display: flex;
 background-color: white;
 margin-bottom: 2px;
 margin-top: 2px;
-padding: 15px 30px 15px 15px;
+padding: 0px 0px 7px 0px;
 border-radius: 5px;
 position: relative;
 white-space: normal;
@@ -27,6 +28,10 @@ const ImageWrapper = styled.div`
   }
 `;
 
+const ReplyUsername = styled.div`
+  font-size: 10px;
+`;
+
 const TimeStamp = styled.div`
   font-size: 10px;
   font-weight: 700;
@@ -37,9 +42,10 @@ function Reply({ reply, ...props }) {
   return (
     <Wrapper>
         <ImageWrapper>
-            <img src={reply.author.image} />
+            <img src={getUserImage(reply.author)} />
         </ImageWrapper>
         <div>
+            <ReplyUsername> {reply.author.username} </ReplyUsername>
             <div> {reply.text} </div>
             <TimeStamp> {formatTimeStamp(reply.created)} </TimeStamp>
         </div>

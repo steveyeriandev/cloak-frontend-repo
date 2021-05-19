@@ -38,8 +38,8 @@ function PostItem({ post, isDisplayedFully }) {
   const contentTypes = useSelector((state) => state.contentTypes.entities);
   const contentTypeObj = contentTypes.find((ct) => ct.id === contentType);
   const isAuthenticated = useSelector((state) => state.account.token !== "");
-  const [showPostModal, hidePostModal] = useModal(({ in: open }) => {
-    return <PostModal post={post} onHide={hidePostModal} />;
+  const [showPostModal, hidePostModal] = useModal(() => {
+    return <PostModal post={post}  onHide={hidePostModal}  />
   });
   const showAuthModal = useAuthenticationModal();
   
@@ -48,7 +48,7 @@ function PostItem({ post, isDisplayedFully }) {
   function renderNewComments() {
     // When the user creates new comments, we need to render them here.
     return newComments.map((comment) => {
-      return <Comment key={comment.id} comment={comment} />;
+      return <Comment key={comment.id} comment={comment} />
     });
   }
 

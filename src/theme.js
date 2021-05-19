@@ -10,6 +10,7 @@ const theme = {
   gray200: "#f2f2f2",
   gray300: "#ededed",
   borderRadius: "10px",
+  red: "red",
   smBreakpoint: "576px",
 
   transitionFast: "0.3s",

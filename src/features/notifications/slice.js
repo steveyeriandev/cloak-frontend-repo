@@ -18,6 +18,10 @@ const notificationsInitialState = {
   // Used to store a single notifications detail data.
   detail: {},
 
+  // display comment replies when notification redirects to 
+  // a comment ( reply on a comment notifications)
+  displayRepliesForComment: null,
+
   // The results of a notifications search
   search: {
     results: [],
@@ -35,6 +39,10 @@ const notificationsSlice = createSlice({
     clearSearch: (state) => {
       state.search = notificationsInitialState.search;
     },
+    setDisplayCommentFor(state, action){
+      const id = action.payload.commentId;
+      state.displayRepliesForComment = id;
+    }
   },
   extraReducers: {
     [fetchNotification.fulfilled]: (state, action) => {
@@ -72,7 +80,8 @@ const notificationsSlice = createSlice({
 
 export const {
   clearnotifications,
-  clearSearch
+  clearSearch,
+  setDisplayCommentFor
 } = notificationsSlice.actions;
 
 export default notificationsSlice.reducer;

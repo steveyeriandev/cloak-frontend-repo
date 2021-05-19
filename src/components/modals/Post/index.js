@@ -37,7 +37,6 @@ function PostModal({ post, ...props }) {
 
   useEffect(() => {
     async function fetchComments() {}
-
     fetchComments();
   });
 
@@ -93,7 +92,7 @@ function PostModal({ post, ...props }) {
 
 PostModal.propTypes = {
   // The post object that will be rendered in the modal.
-  post: PropTypes.object.isRequired,
+  post: PropTypes.object.isRequired
 };
 
 export default PostModal;

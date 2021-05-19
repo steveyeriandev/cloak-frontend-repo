@@ -6,8 +6,9 @@ import NotificationIcon from "images/icons/notification.png";
 import { listNotifications, partialUpdateNotifications  } from "features/notifications/thunks";
 import { useDispatch, useSelector } from "react-redux";
 import { useToasts } from 'react-toast-notifications';
-import { getProjectUrl } from "../../../utils/projects";
+import { formatTimeStamp } from "utils/datetime";
 import { useNavigate } from "@reach/router";
+import { setDisplayCommentFor } from "features/notifications/slice";
 
 const StyledNavDropdown = styled(NavDropdown)`
     .dropdown-toggle::before{
@@ -135,7 +136,6 @@ function NotificationsDropdown() {
   // Provides the a dropdown for the list of notifcations related to the logged in user.
 
   const  notifcationsState    = useSelector((state) => state.notifications);
-  const projectState = useSelector((state) => state.projects);
   const { isLoading, entities} = notifcationsState;
   const { addToast } = useToasts();
   const dispatch = useDispatch();
@@ -161,6 +161,8 @@ function NotificationsDropdown() {
       return `${actor} has ${notification.action.verb} you`;
     } else if (notification.action.verb === "liked") {
       return `${actor} has Liked your post ${notification.action.target.text ? notification.action.target.text : ""}.`;
+    } else if (notification.action.verb === "replied to a comment") {
+      return `${actor} replied to your comment.`;
     } else {
       return ""
     }
@@ -199,6 +201,10 @@ function NotificationsDropdown() {
     } else if (notification.action.verb === "liked") {
       const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
       navigate(url); 
+    } else if (notification.action.verb === "replied to a comment") {
+      const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
+      dispatch(setDisplayCommentFor({commentId: notification.action.target.id}));
+      navigate(url); 
     }
     return ""
   }
@@ -220,19 +226,8 @@ function NotificationsDropdown() {
           <NotificationHeader> Notifications </NotificationHeader>
           {isLoading ? "Loading" : entities.results && entities.results.length ? 
             entities.results.map(notification => {
-              const notDate = new Date(notification.action.timestamp);
-              let month = notDate.getMonth() + 1;
-              let day = notDate.getDate();
-              let hour = notDate.getHours();
-              let min = notDate.getMinutes();
-              let year = notDate.getFullYear();
-          
-              month = (month < 10 ? "0" : "") + month;
-              day = (day < 10 ? "0" : "") + day;
-              hour = (hour < 10 ? "0" : "") + hour;
-              min = (min < 10 ? "0" : "") + min;
-              const notDateFormated = `${day}/${month}/${year} ${hour}:${min} `
-              
+              const notDateFormated = formatTimeStamp(notification.action.timestamp)
+
               return (
                 <StyledDropDownItem
                 seen={notification.seen ? "seen" : null}

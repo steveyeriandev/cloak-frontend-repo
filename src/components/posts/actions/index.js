@@ -4,8 +4,8 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp  } from "@fortawesome/free-solid-svg-icons";
-import { faThumbsUp as regularFaThumbsUp } from "@fortawesome/free-regular-svg-icons";
+import { faHeart  } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as regularFaHeart } from "@fortawesome/free-regular-svg-icons";
 
 import useAuthenticationModal from "hooks/AuthModal";
 import { addLike } from "features/posts/thunks";
@@ -15,32 +15,26 @@ const StyledFontAwesomeLikeActivated = styled(FontAwesomeIcon)`
   cursor: pointer;
 `
 const TotalLikes = styled.div`
-  color: ${props => props.theme.success};
+  color: ${props => props.theme.red};
   font-weight: 700;
   margin-left: 4px;
   margin-top: 4px;
-  font-size: 20px;
+  font-size: 16px;
   cursor: pointer;
 `;
 
 const Wrapper = styled.div`
-margin-top: 10px;
-  border-top: 1px solid ${props => props.theme.success};
   border-bottom: 1px solid ${props => props.theme.success};
-  padding: 10px 10px;
+  padding: 10px;
   display: flex;
   align-items: center;
 `;
 
 
-function PostActions({post}){
+function PostActions({post, ...props}){
   // reders the actions for a Post (likes, shares ...etc)
 
   const { 
-      createdBy, 
-      text, 
-      contentObject, 
-      contentType, 
       isLikedByCurrentUser, 
       likesCount
     } = post;
@@ -61,7 +55,8 @@ function PostActions({post}){
   return (
       <Wrapper>
         <StyledFontAwesomeLikeActivated 
-          icon={isLikedByCurrentUser ? faThumbsUp : regularFaThumbsUp} 
+          icon={isLikedByCurrentUser ? faHeart : regularFaHeart} 
+          color="red"
           size="2x" 
           onClick={isAuthenticated ? handleLikeClick : showAuthModal}
         />

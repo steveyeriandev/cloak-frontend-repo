@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Link } from "@reach/router";
 import reactStringReplace from "react-string-replace";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import Form from "react-bootstrap/Form";
 import useAuthenticationModal from "hooks/AuthModal";
-import { useSelector } from "react-redux";
 import Button from "react-bootstrap/Button";
 import { useToasts } from "react-toast-notifications";
 
 import Loading from "components/loading/Loading";
 import CommentService from "features/comments/service";
+import RepliesList from "components/replies/repliesList";
 
 const Wrapper = styled.div`
   display: flex;
@@ -72,34 +73,60 @@ const Actions = styled.div`
 
 function Comment({ comment, ...props }) {
   // Displays an individual comment.
+  const { addToast } = useToasts();
+  const displayRepliesForComment = useSelector((state) => state.notifications.displayRepliesForComment);
   const [hideReplyInput, setHideRplyInput] = useState(true);
-  const [reply, setReply] = useState("");
+  const showReplies = displayRepliesForComment === comment.id;
+  const [hideRepliesList, setHideRepliesList] = useState(true);
+  const [replyText, setReplyText] = useState("");
+  const [replies, setReplies] = useState([]);
+  const [next, setNext] = useState(null);
+  const [repliesLoading, setRepliesLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [countReplies, setCountReplies] = useState(comment.repliesCount);
+
   const isAuthenticated = useSelector((state) => state.account.token !== "");
   const showAuthModal = useAuthenticationModal();
-  const [isLoading, setIsLoading] = useState(false);
   const service = new CommentService();
-  const { addToast } = useToasts();
+
+  useEffect(() => showReplies ? displayReplies() : "",[]);
+  async function fetchCommentReplies(){
+    setRepliesLoading(true);
+    try {
+      const response = await service.fetchReplies({commentId: comment.id, next});
+      setRepliesLoading(false);
+      setReplies([...replies, ...response.data]);
+      // later on when we include pagination
+      // setNext(response.data.next);
+    } catch (err) {
+      addToast(
+        "Error Occured while trying to create a reply check your internet connection please!",
+        { appearance: "error" }
+      );
+      setRepliesLoading(false);
+    } 
+  }
 
   function handleChange(e){
-    setReply(e.target.value);
+    setReplyText(e.target.value);
   }
 
   function handleKeyDown(e){
-    // Submit the comment if the user hits enter.
+    // Submit the reply if the user hits enter.
     if (e.key === "Enter") isAuthenticated ? createReply() : showAuthModal();
   }
 
   async function createReply(){
     setIsLoading(true);
-    if (reply){
+    if (replyText){
       try {
-        const response = await service.addReply({commentId: comment.id, data: {text: reply}});
+        const response = await service.addReply({commentId: comment.id, data: {text: replyText}});
         setIsLoading(false);
         setHideRplyInput(true);
-        setReply("");
+        setReplyText("");
         const newCount = countReplies+1;
         setCountReplies(newCount);
+        setReplies([response.data, ...replies])
       } catch (err) {
         addToast(
           "Error Occured while trying to create a reply check your internet connection please!",
@@ -113,6 +140,13 @@ function Comment({ comment, ...props }) {
         { appearance: "error" }
       );  
     }
+  }
+
+  function displayReplies(){
+    if (!replies.length){
+      fetchCommentReplies();
+    }
+    setHideRepliesList(!hideRepliesList);
   }
 
   function renderText() {
@@ -140,27 +174,40 @@ function Comment({ comment, ...props }) {
       {renderText()}
       <Actions>
       <ReplyBtn onClick={() => setHideRplyInput(!hideReplyInput)}> Reply </ReplyBtn>
-      |
-      <TotalReplies > Total Replies ({countReplies}) </TotalReplies>
+      {countReplies ?
+        <>
+          |
+          <TotalReplies 
+            onClick={isAuthenticated ? displayReplies : showAuthModal}
+            > 
+            Total Replies ({countReplies}) 
+          </TotalReplies>
+        </> : ""
+      }
       </Actions>
       {!hideReplyInput ?
         <Wrapper {...props}>
-        <CommentControl
-          placeholder="Write your reply..."
-          className="bg-white"
-          value={reply}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-        >
-        </CommentControl>
-        <Button
-          variant="link"
-          onClick={isAuthenticated ? createReply : showAuthModal}
-          style={{ width: 100 }}
-        >
-          {isLoading ? <Loading size="sm" /> : "Submit"}
-        </Button>
-      </Wrapper> : ""
+          <CommentControl
+            placeholder="Write your reply..."
+            className="bg-white"
+            value={replyText}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+          >
+          </CommentControl>
+          <Button
+            variant="link"
+            onClick={isAuthenticated ? createReply : showAuthModal}
+            style={{ width: 100 }}
+          >
+            {isLoading ? <Loading size="sm" /> : "Submit"}
+          </Button>
+        </Wrapper> : ""
+      }
+      {
+        !hideRepliesList ?
+        repliesLoading ? <Loading size="sm" /> 
+        : <RepliesList replies={replies} /> : ""
       }
     </div>
   );
@@ -168,7 +215,7 @@ function Comment({ comment, ...props }) {
 
 Comment.propTypes = {
   // The comment which we're rendering.
-  comment: PropTypes.object.isRequired,
+  comment: PropTypes.object.isRequired
 };
 
 export default Comment;

@@ -29,24 +29,26 @@ function SiteFeedRoute() {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const postState = useSelector((state) => state.posts);
-  const search = new URLSearchParams(location.search);
-  const object_id = search.get("object_id");
-  const content_type = search.get("content_type");
+  // if there is a redirection from notification
+  // detailed post will represent this notification target
   const detailedPost = postState.selectedEntity;
-  // const [showPostModal, hidePostModal] = useModal(() => {
-  //   return <PostModal post={detailedPost} onHide={hidePostModal} />;
-  // });
 
+  // url params used to detect if there is a redirection from
+  // notification list
+  const search = new URLSearchParams(location.search);
+  const objectId = search.get("object_id");
+  const contentType = search.get("content_type");
+  
   useEffect(() => loadFeedData({ fresh: true }), []);
   useEffect(() => {
     dispatch(clearSelectedEntity());
-    if (object_id) {loadPostDetails(object_id, content_type);};
-  }, [object_id]);
+    if (objectId) {loadPostDetails(objectId, contentType);};
+  }, [objectId]);
 
-  async function loadPostDetails(object_id, content_type) {
-    const action = await dispatch(fetchPostDetailsWithContentType({objectId: object_id, contentType: content_type}));
+  async function loadPostDetails(objectId, contentType) {
+    const action = await dispatch(fetchPostDetailsWithContentType({objectId: objectId, contentType: contentType}));
     if ( action.type === "FETCH_POST_DETAILS/rejected" ) {
-      addToast("Error while fetching post with post id : " + object_id , { appearance: "error" });
+      addToast("Error while fetching post with post id : " + objectId , { appearance: "error" });
     }
   }
 
@@ -67,7 +69,7 @@ function SiteFeedRoute() {
   // if this page is render after user clicks a notification
   // we show the notification post on top
   function renderSelectedPostDetails() {
-    if (detailedPost && object_id) {
+    if (detailedPost && objectId) {
       return (
       <Col md={{ span: 8, offset: 2 }} key={detailedPost.id}>
         <Post post={detailedPost} isDisplayedFully={true} />

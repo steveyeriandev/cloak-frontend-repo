@@ -20,6 +20,15 @@ class CommentService extends ApiService {
     const url = `${this._getDetailUrl(commentId)}add_reply/`;
     return axiosInstance.post(url, data);
   }
+
+  fetchReplies({commentId, next}){
+    // get list of replies for a given comment
+    if (next){
+      return axiosInstance.get(next);
+    }
+    const url = `${this._getDetailUrl(commentId)}replies/`;
+    return axiosInstance.get(url);
+  }
 }
 
 export default CommentService;

@@ -37,6 +37,7 @@ const StyledNavDropdown = styled(NavDropdown)`
     overflow-y: auto;
     padding: 20px 10px;
     width: 400px;
+    position: absolute !important;
     &::-webkit-scrollbar {
       width: 0.5em;
       height: 0.5em;
@@ -54,6 +55,12 @@ const StyledNavDropdown = styled(NavDropdown)`
        background: ${props => props.theme.gray300};
       }
      }
+
+     @media (max-width: ${(props) => props.theme.smBreakpoint}) {
+      width: 250px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
 
   }
 `;
@@ -105,6 +112,7 @@ const StyledNotIcon = styled.img`
   @media (max-width: ${(props) => props.theme.smBreakpoint}) {
     width: auto;
   }
+  margin-right: 5px;
   padding: 10px;
   background-color: ${(props) => props.theme.gray300};
   border-radius: ${(props) => props.theme.borderRadius};
@@ -128,7 +136,7 @@ const ImageWrapper = styled.div`
   border-radius: 50%;
   margin-right: 10px;
   img {
-    width: 100%;
+    width: 50px;
     border-radius: 50%;
     box-shadow: 2px 2px 1px ${props => props.theme.gray300};
   }
@@ -155,18 +163,21 @@ function NotificationsDropdown() {
   }
 
   const renderNotificationContent = (notification) =>{
-    const actor = notification.action.actor ? notification.action.actor.firstName : "";
+    const { target, verb, actor } = notification.action;
+    const actorUsername = actor ? actor.username : "";
     
-    if (notification.action.verb === "made a comment") {
-      return `${actor} ${notification.action.verb} on ${notification.action.target.bucket ? notification.action.target.bucket.title : notification.action.target.title}`;
-    } else if (notification.action.verb === "mentioned") {
-      return `${actor} has ${notification.action.verb} you`;
-    } else if (notification.action.verb === "liked") {
-      return `${actor} has Liked your post ${notification.action.target.text ? notification.action.target.text : ""}.`;
-    } else if (notification.action.verb === "replied to a comment") {
-      return `${actor} replied to your comment.`;
-    } else {
-      return ""
+    switch (notification.action.verb) {
+      case "made a comment":
+        return `${actorUsername} ${verb} on ${target.bucket ? target.bucket.title : target.title}`;
+      case "mentioned":
+        return `${actorUsername} has ${verb} you`;
+      case "liked":
+        return `${actorUsername} has Liked your post ${target.text ? target.text : ""}.`;
+      case "replied to a comment":
+        return `${actorUsername} replied to your comment.`;
+
+      default:
+        return "";
     }
   }
 
@@ -185,21 +196,29 @@ function NotificationsDropdown() {
   }
 
   const redirectToNotificationUrl = (notification) => {
-    if (notification.action.verb === "made a comment" ) {
-        const url = `/feed?object_id=${notification.action.actionObject.objectId}&content_type=${notification.action.actionObject.contentType}`
-        navigate(url);
-    } else if (notification.action.verb === "mentioned") {
-      const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
-      navigate(url); 
-    } else if (notification.action.verb === "liked") {
-      const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
-      navigate(url); 
-    } else if (notification.action.verb === "replied to a comment") {
-      const url = `/feed?object_id=${notification.action.target.objectId}&content_type=${notification.action.target.contentType}`
-      dispatch(setDisplayCommentFor({commentId: notification.action.target.id}));
-      navigate(url); 
+    const { target, actionObject } = notification.action;
+    var url = "/feed";
+
+    switch (notification.action.verb) {
+      case "made a comment":
+        url = `/feed?object_id=${actionObject.objectId}&content_type=${actionObject.contentType}`;
+        break;
+      case "mentioned":
+        url = `/feed?object_id=${target.objectId}&content_type=${target.contentType}`;
+        break;
+      case "liked":
+        url = `/feed?object_id=${target.objectId}&content_type=${target.contentType}`;
+        break;
+      case "replied to a comment":
+        url = `/feed?object_id=${target.objectId}&content_type=${target.contentType}`;
+        dispatch(setDisplayCommentFor({commentId: target.id}));
+        break;
+
+      default:
+        url = "/feed";
     }
-    return ""
+
+    navigate(url); 
   }
 
   useEffect(() => {
